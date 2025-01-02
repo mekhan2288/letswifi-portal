@@ -109,6 +109,7 @@ class Provider implements JsonSerializable
 	public function getRealmsByAffiliations( array $affiliations ): array
 	{
 		// TODO: Move this part to its own class, this is too tight a coupling
+		// It might be better in the Realm class, or in the \letswifi\auth namespace.
 		$result = [];
 		foreach ( $this->realmMap as $affiliation => $realms ) {
 			if ( '*' === $affiliation || \in_array( $affiliation, $affiliations, true ) ) {

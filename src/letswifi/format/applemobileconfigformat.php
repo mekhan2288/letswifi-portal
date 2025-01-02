@@ -11,6 +11,7 @@
 namespace letswifi\format;
 
 use InvalidArgumentException;
+use fyrkat\openssl\X509;
 use letswifi\credential\CertificateCredential;
 use letswifi\provider\NetworkPasspoint;
 use letswifi\provider\NetworkSSID;
@@ -29,7 +30,7 @@ class AppleMobileconfigFormat extends Format
 		$tlsAuthMethodUuid = static::uuidgen();
 		$defaultPassphrase = 'pkcs12';
 
-		/** @var array<\fyrkat\openssl\X509> */
+		/** @var array<X509> */
 		$caCertificates = $this->credential->realm->trust;
 
 		// If we include the CA, MacOS will also trust that CA for HTTPS traffic
@@ -97,7 +98,7 @@ class AppleMobileconfigFormat extends Format
 			\array_fill( 0, \count( $caCertificates ), null ),
 		);
 
-		/** @var array<string,\fyrkat\openssl\X509> */
+		/** @var array<string,X509> */
 		$caCertificates = \array_combine( $uuids, $caCertificates );
 		foreach ( $caCertificates as $uuid => $ca ) {
 			$result .= ''

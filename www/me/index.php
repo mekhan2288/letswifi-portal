@@ -18,7 +18,7 @@ $app->registerExceptionHandler();
 $provider = $app->getProvider();
 $user = $provider->requireAuth();
 
-return $app->render(
+$app->render(
 	[
 		'href' => "{$basePath}/me/",
 		'user' => $user,

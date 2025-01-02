@@ -45,7 +45,7 @@ if ( isset( $passphrase ) ) {
 }
 
 switch ( $_SERVER['REQUEST_METHOD'] ) {
-	case 'GET': return $app->render(
+	case 'GET': $app->render(
 		[
 			'href' => $href,
 			'passphrase' => ( $passphrase ?? null ) ?: null,

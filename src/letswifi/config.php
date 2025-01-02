@@ -24,7 +24,7 @@ abstract class Config
 	protected array $keyPrefix = [];
 
 	/** @var array<string,mixed> */
-	private $conf;
+	private array $conf;
 
 	/**
 	 * @param ?array|string $conf PHP file
@@ -50,6 +50,37 @@ abstract class Config
 	public function __debugInfo(): array
 	{
 		return [];
+	}
+
+	/**
+	 * @template T
+	 *
+	 * @param T $t
+	 *
+	 * @return ?T
+	 */
+	public function getOrNull( string $key, mixed $t )
+	{
+		$data = $this->getField( $key );
+		if ( \is_object( $data ) && $data instanceof $t ) {
+			/** @psalm-suppress InvalidReturnStatement */
+			return $data;
+		}
+		if ( \gettype( $t ) === \gettype( $data ) ) {
+			return $data;
+		}
+	}
+
+	/**
+	 * @template T
+	 *
+	 * @param T $t
+	 *
+	 * @return T
+	 */
+	public function get( string $key, mixed $t )
+	{
+		return $this->getOrNull( $key, $t ) ?? throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be string, but is null" );
 	}
 
 	public function getString( string $key ): string
@@ -128,8 +159,9 @@ abstract class Config
 		}
 		foreach ( $data as $k => &$value ) {
 			if ( \is_array( $value ) && \is_string( \key( $value ) ) ) {
+				// TODO wtf?!
 				$value = clone $this;
-				$value->conf = $value;
+				$value->conf = $value->conf;
 				$value->keyPrefixStr .= "{$key}[{$k}]";
 				$value->keyPrefix[] = $key;
 				$value->keyPrefix[] = $k;
@@ -165,7 +197,10 @@ abstract class Config
 	public function getNumericOrNull( string $key ): string|int|float|null
 	{
 		$data = $this->getField( $key );
-		if ( null === $data || !\is_numeric( $data ) ) {
+		if ( null === $data ) {
+			return null;
+		}
+		if ( !\is_numeric( $data ) ) {
 			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be numeric, but is " . \gettype( $data ) );
 		}
 

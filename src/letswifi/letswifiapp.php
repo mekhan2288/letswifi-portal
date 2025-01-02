@@ -44,17 +44,14 @@ final class LetsWifiApp
 	/** Fallback locale used when the Accept-Language header was not set */
 	public const FALLBACK_LOCALE = 'en';
 
-	/** @var bool */
-	private $crashing = false;
+	/** Prevent endless loop if an exception occurs when rendering the error page */
+	private bool $crashing = false;
 
-	/** @var ?PDO */
-	private $pdo;
+	private ?PDO $pdo = null;
 
-	/** @var ?\Twig\Environment */
-	private $twig;
+	private ?Environment $twig = null;
 
-	/** @var TenantConfig */
-	private $tenantConfig;
+	private TenantConfig $tenantConfig;
 
 	private ?TranslationContext $translationContext = null;
 
@@ -113,7 +110,7 @@ final class LetsWifiApp
 		exit( 1 );
 	}
 
-	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): void
+	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): never
 	{
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );

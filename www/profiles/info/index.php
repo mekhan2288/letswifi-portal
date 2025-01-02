@@ -20,7 +20,7 @@ $profileInfo = (array)$provider->getContact();
 $profileInfo['displayName'] = $provider->displayName;
 $profileInfo['description'] = $provider->description;
 
-return $app->render(
+$app->render(
 	[
 		'href' => "{$basePath}/profiles/info/",
 		'http://letswifi.app/profile#v2' => $profileInfo,

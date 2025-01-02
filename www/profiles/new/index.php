@@ -79,7 +79,7 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 }
 
 switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
-	case 'GET': return $app->render(
+	case 'GET': $app->render(
 		[
 			'href' => "{$basePath}/profiles/new/",
 			'formats' => [
@@ -95,6 +95,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 			],
 		], 'profile-advanced', $basePath, );
 
+		exit; // should not be reached
 	case 'POST':
 		if ( \array_key_exists( 'realm', $_POST ) ) {
 			$realm = $_POST['realm'];
