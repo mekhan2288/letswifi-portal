@@ -5,32 +5,34 @@
 {% block content %}
 <main>
 	<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
-	<p>For most users, the easiest way to use geteduroam is to use one of the official apps.</p>
+	<p>{{ 'We recommend that you use the app'|t }}</p>
 	<ul class="apps buttons">
-		<li><a class="btn btn-default" href="{{ app.url }}">Download the apps</a></li>
+		<li><a class="btn btn-default" href="{{ app.url }}">{{ 'Download the app'|t }}</a></li>
 	</ul>
 	<hr>
 	<details>
-		<summary>Advanced</summary>
+		<summary>{{ 'Create configuration profile'|t }} ({{ 'advanced'|t }})</summary>
 		<form method="post">
 			<p>
-				For advanced users, and for using eduroam on a device where no app is yet available,
-				it is also possible to download a configuration profile.
+				{{ 'Alternatively, you can use a configuration profile'|t }}
 			<div class="fieldsets">
 {% include 'realm-picker.html' %}
 				<fieldset id="profile-encrypt">
-					<legend accesskey="e">Encryption</legend>
+					<legend accesskey="e">{{ 'Encryption'|t }}</legend>
 				<p>
-					Encrypting your profile requires you to enter the passphrase once when installing the profile.<br>
-					This may be needed on some systems in order to import the certificate bundle.
+					{{ 'When encrypting you need a passphrase when installing'|t}}
 				<p>
-					<label for="passphrase">Enter a passphrase to be used during installation (optional)</label><br>
+					{{ 'Passphrase is only needed during installation'|t }}
+				<p>
+					{{ 'Use the feature depending encryption support on your system'|t }}
+				<p>
+					<label for="passphrase">{{ 'Enter passphrase for encryption'|t }} ({{ 'optional'|t }})</label><br>
 					<input id="passphrase" name="passphrase" type="password" size="12">
 				</fieldset>
 			</div>
 			<ul class="apps devices buttons">
 {% for formatName, formatData in formats %}
-				<li><button type="submit" name="format" value="{{ formatName }}" class="btn btn-default">{{ formatData.name }}</button></li>
+				<li><button type="submit" name="format" value="{{ formatName }}" class="btn btn-default">{{ formatData.name|t }}</button></li>
 {% endfor %}
 			</ul>
 		</form>

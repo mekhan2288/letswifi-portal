@@ -11,11 +11,12 @@
 namespace letswifi\provider;
 
 use DomainException;
+use fyrkat\multilang\MultiLanguageString;
 use letswifi\Config;
 
 abstract class Network
 {
-	public function __construct( public readonly string $networkId, public readonly string $displayName )
+	public function __construct( public readonly string $networkId, public readonly MultiLanguageString $displayName )
 	{
 	}
 

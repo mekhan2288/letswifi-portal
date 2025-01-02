@@ -13,6 +13,7 @@ namespace letswifi\provider;
 use DateInterval;
 use DomainException;
 use JsonSerializable;
+use fyrkat\multilang\MultiLanguageString;
 use fyrkat\openssl\X509;
 use letswifi\Config;
 
@@ -26,12 +27,12 @@ class Realm implements JsonSerializable
 	public function __construct(
 		private readonly TenantConfig $tenantConfig,
 		public readonly string $realmId,
-		public readonly string $displayName,
+		public readonly MultiLanguageString $displayName,
 		public readonly array $serverNames,
 		public readonly array $trust,
 		public readonly DateInterval $validity,
 		public readonly array $networks,
-		public readonly ?string $description = null,
+		public readonly ?MultiLanguageString $description = null,
 		public readonly ?string $contactId = null,
 	) {
 	}
@@ -41,12 +42,12 @@ class Realm implements JsonSerializable
 		return new self(
 			tenantConfig: $tenantConfig,
 			realmId: $realmData->getParentKey(),
-			displayName: $realmData->getString( 'display_name' ),
+			displayName: $realmData->getMultiLanguageString( 'display_name' ),
 			serverNames: $realmData->getList( 'server_names' ),
 			trust: $tenantConfig->getCertificatesWithChain( ...$realmData->getList( 'trust' ) ),
 			validity: static::getValidity( $realmData->getNumeric( 'validity' ) ),
 			networks: $tenantConfig->getNetworks( ...$realmData->getList( 'networks' ) ),
-			description: $realmData->getString( 'description' ),
+			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getString( 'contact' ),
 		);
 	}

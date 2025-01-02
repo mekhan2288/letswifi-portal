@@ -10,6 +10,7 @@
 
 namespace letswifi\provider;
 
+use fyrkat\multilang\MultiLanguageString;
 use letswifi\Config;
 
 class NetworkPasspoint extends Network
@@ -20,7 +21,7 @@ class NetworkPasspoint extends Network
 	 */
 	public function __construct(
 		string $networkId,
-		string $displayName,
+		MultiLanguageString $displayName,
 		public readonly array $oids,
 		public readonly array $naiRealms,
 	) {
@@ -31,7 +32,7 @@ class NetworkPasspoint extends Network
 	{
 		return new self(
 			networkId: $networkConfig->getParentKey(),
-			displayName: $networkConfig->getString( 'display_name' ),
+			displayName: $networkConfig->getMultiLanguageString( 'display_name' ),
 			oids: $networkConfig->getList( 'oid' ),
 			naiRealms: $networkConfig->getListOrEmpty( 'nai' ),
 		);

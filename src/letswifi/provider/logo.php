@@ -23,9 +23,12 @@ class Logo
 	{
 	}
 
-	public static function fromConfig( Config $logo ): self
+	public static function fromConfig( Config $logo ): ?self
 	{
-		$contentType = $logo->getString( 'content_type' );
+		$contentType = $logo->getStringOrNull( 'content_type' );
+		if ( null === $contentType ) {
+			return null;
+		}
 
 		return new self( imageGenerator: static fn(): string => $logo->getString( 'bytes' ), contentType: $contentType );
 	}

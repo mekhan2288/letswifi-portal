@@ -12,6 +12,7 @@ namespace letswifi\provider;
 
 use DomainException;
 use JsonSerializable;
+use fyrkat\multilang\MultiLanguageString;
 use letswifi\Config;
 use letswifi\auth\AuthenticationContext;
 use letswifi\auth\User;
@@ -24,11 +25,11 @@ class Provider implements JsonSerializable
 	public function __construct(
 		private readonly TenantConfig $tenantConfig,
 		public readonly string $host,
-		public readonly string $displayName,
+		public readonly MultiLanguageString $displayName,
 		public readonly AuthenticationContext $auth,
 		public readonly array $realmMap,
 		public readonly ?string $contactId = null,
-		public readonly ?string $description = null,
+		public readonly ?MultiLanguageString $description = null,
 	) {
 	}
 
@@ -54,11 +55,11 @@ class Provider implements JsonSerializable
 		return new self(
 			tenantConfig: $tenantConfig,
 			host: $data->getParentKey(),
-			displayName: $data->getString( 'display_name' ),
+			displayName: $data->getMultiLanguageString( 'display_name' ),
 			auth: $auth,
 			realmMap: $data->getRawArray( 'realm' ),
 			contactId: $data->getString( 'contact' ),
-			description: $data->getString( 'description' ),
+			description: $data->getMultiLanguageStringOrNull( 'description' ),
 		);
 	}
 

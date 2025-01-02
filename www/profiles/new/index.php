@@ -120,6 +120,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 		}
 		$formatter = Format::getFormatter( $format ?? 'NULL',
 			credential: $credential,
+			translator: $app->getTranslationContext(),
 			profileSigner: $app->getProfileSigner(),
 			passphrase: $passphrase,
 		);

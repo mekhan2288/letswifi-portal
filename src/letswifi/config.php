@@ -12,6 +12,7 @@ namespace letswifi;
 
 use DomainException;
 use OutOfBoundsException;
+use fyrkat\multilang\MultiLanguageString;
 
 abstract class Config
 {
@@ -169,6 +170,27 @@ abstract class Config
 		}
 
 		return $data;
+	}
+
+	public function getMultiLanguageStringOrNull( string $key ): ?MultiLanguageString
+	{
+		$data = $this->getField( $key );
+		if ( !empty( $data ) && !\is_string( \key( $data ) ) ) {
+			throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be dictionary, but is list" );
+		}
+		if ( \is_array( $data ) ) {
+			return new MultiLanguageString( $data );
+		}
+		if ( null === $data ) {
+			return null;
+		}
+
+		throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be dictionary, but is " . \gettype( $data ) );
+	}
+
+	public function getMultiLanguageString( string $key ): MultiLanguageString
+	{
+		return $this->getMultiLanguageStringOrNull( $key ) ?? throw new DomainException( "Expecting config key {$this->keyPrefixStr}{$key} to be dictionary, but is null" );
 	}
 
 	protected function getField( string $key ): mixed

@@ -41,11 +41,11 @@ class AppleMobileconfigFormat extends Format
 			. "\n" . '<plist version="1.0">'
 			. "\n<dict>"
 			. "\n	<key>PayloadDisplayName</key>"
-			. "\n	<string>" . static::e( $this->credential->realm->displayName ) . '</string>'
+			. "\n	<string>" . $this::e( $this->credential->realm->displayName ) . '</string>'
 			. "\n	<key>PayloadIdentifier</key>"
-			. "\n	<string>" . static::e( $identifier ) . '</string>'
+			. "\n	<string>" . $this::e( $identifier ) . '</string>'
 			. "\n	<key>PayloadUUID</key>"
-			. "\n	<string>" . static::e( $uuid ) . '</string>'
+			. "\n	<string>" . $this::e( $uuid ) . '</string>'
 			. "\n	<key>PayloadRemovalDisallowed</key>"
 			. "\n	<false/>"
 			. "\n	<key>PayloadType</key>"
@@ -55,13 +55,13 @@ class AppleMobileconfigFormat extends Format
 			. "\n";
 		if ( null !== $description = $this->credential->realm->description ) {
 			$result .= '	<key>PayloadDescription</key>'
-				. "\n	<string>" . static::e( $description ) . '</string>'
+				. "\n	<string>" . $this::e( $description ) . '</string>'
 				. "\n";
 		}
 		if ( null !== $expiry = $this->credential->getExpiry() ) {
 			$expiryString = \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() );
 			$result .= '	<key>RemovalDate</key>'
-					. "\n	<date>" . static::e( $expiryString ) . '</date>'
+					. "\n	<date>" . $this::e( $expiryString ) . '</date>'
 					. "\n";
 		}
 		$result .= '	<key>PayloadContent</key>'
@@ -70,20 +70,20 @@ class AppleMobileconfigFormat extends Format
 			. "\n";
 		if ( !$this->passphrase ) {
 			$result .= '			<key>Password</key>'
-				. "\n			<string>" . static::e( $defaultPassphrase ) . '</string>'
+				. "\n			<string>" . $this::e( $defaultPassphrase ) . '</string>'
 				. "\n";
 		}
 		$result .= '			<key>PayloadUUID</key>'
-			. "\n			<string>" . static::e( $tlsAuthMethodUuid ) . '</string>'
+			. "\n			<string>" . $this::e( $tlsAuthMethodUuid ) . '</string>'
 			. "\n			<key>PayloadIdentifier</key>"
-			. "\n			<string>" . static::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
+			. "\n			<string>" . $this::e( $identifier . '.' . $tlsAuthMethodUuid ) . '</string>'
 			. "\n			<key>PayloadCertificateFileName</key>"
-			. "\n			<string>" . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '.p12</string>'
+			. "\n			<string>" . $this::e( $pkcs12->x509->getSubject()->getCommonName() ) . '.p12</string>'
 			. "\n			<key>PayloadDisplayName</key>"
-			. "\n			<string>" . static::e( $pkcs12->x509->getSubject()->getCommonName() ) . '</string>'
+			. "\n			<string>" . $this::e( $pkcs12->x509->getSubject()->getCommonName() ) . '</string>'
 			. "\n			<key>PayloadContent</key>"
 			. "\n			<data>"
-			. "\n				" . static::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
+			. "\n				" . $this::e( static::columnFormat( \base64_encode( $pkcs12->getPKCS12Bytes( $this->passphrase ?: $defaultPassphrase ) ), 52, 4 ) )
 			. "\n			</data>"
 			. "\n			<key>PayloadType</key>"
 			. "\n			<string>com.apple.security.pkcs12</string>"
@@ -103,19 +103,19 @@ class AppleMobileconfigFormat extends Format
 			$result .= ''
 				. "\n		<dict>"
 				. "\n			<key>PayloadCertificateFileName</key>"
-				. "\n			<string>" . static::e( $ca->getSubject()->getCommonName() ) . '.cer</string>'
+				. "\n			<string>" . $this::e( $ca->getSubject()->getCommonName() ) . '.cer</string>'
 				. "\n			<key>PayloadContent</key>"
 				. "\n			<data>"
 				. "\n				" . static::columnFormat( \base64_encode( $ca->getX509Der() ), indentation: 4 )
 				. "\n			</data>"
 				. "\n			<key>PayloadDisplayName</key>"
-				. "\n			<string>" . static::e( $ca->getSubject()->getCommonName() ) . '</string>'
+				. "\n			<string>" . $this::e( $ca->getSubject()->getCommonName() ) . '</string>'
 				. "\n			<key>PayloadIdentifier</key>"
-				. "\n			<string>" . static::e( $identifier . '.' . $uuid ) . '</string>'
+				. "\n			<string>" . $this::e( "{$identifier}.{$uuid}" ) . '</string>'
 				. "\n			<key>PayloadType</key>"
 				. "\n			<string>com.apple.security.root</string>"
 				. "\n			<key>PayloadUUID</key>"
-				. "\n			<string>" . static::e( $uuid ) . '</string>'
+				. "\n			<string>" . $this::e( $uuid ) . '</string>'
 				. "\n			<key>PayloadVersion</key>"
 				. "\n			<integer>1</integer>"
 				. "\n		</dict>"
@@ -144,7 +144,7 @@ class AppleMobileconfigFormat extends Format
 					. "\n				<array>"
 					. "\n";
 				foreach ( $caCertificates as $uuid => $_ ) {
-					$result .= '					<string>' . static::e( $uuid ) . '</string>'
+					$result .= '					<string>' . $this::e( $uuid ) . '</string>'
 						. "\n";
 				}
 				$result .= '				</array>'
@@ -152,10 +152,9 @@ class AppleMobileconfigFormat extends Format
 					. "\n				<array>"
 					. "\n";
 				foreach ( $this->credential->realm->serverNames as $serverName ) {
-					$result .= '					<string>' . static::e( $serverName ) . '</string>'
+					$result .= '					<string>' . $this::e( $serverName ) . '</string>'
 						. "\n";
 				}
-				$payloadDisplayName = $network->displayName;
 				$result .= '				</array>'
 					. "\n			</dict>"
 					. "\n			<key>EncryptionType</key>"
@@ -163,11 +162,11 @@ class AppleMobileconfigFormat extends Format
 					. "\n			<key>HIDDEN_NETWORK</key>"
 					. "\n			<false/>"
 					. "\n			<key>PayloadCertificateUUID</key>"
-					. "\n			<string>" . static::e( $tlsAuthMethodUuid ) . '</string>'
+					. "\n			<string>" . $this::e( $tlsAuthMethodUuid ) . '</string>'
 					. "\n			<key>PayloadDisplayName</key>"
-					. "\n			<string>Wi-Fi (" . static::e( $payloadDisplayName ) . ')</string>'
+					. "\n			<string>Wi-Fi (" . $this::e( $network->displayName ) . ')</string>'
 					. "\n			<key>PayloadIdentifier</key>"
-					. "\n			<string>" . static::e( $identifier ) . '.wifi.' . $payloadNetworkCount . '</string>'
+					. "\n			<string>" . $this::e( $identifier ) . '.wifi.' . $payloadNetworkCount . '</string>'
 					. "\n			<key>PayloadType</key>"
 					. "\n			<string>com.apple.wifi.managed</string>"
 					. "\n			<key>PayloadUUID</key>"
@@ -180,7 +179,7 @@ class AppleMobileconfigFormat extends Format
 			}
 			if ( $network instanceof NetworkSSID ) {
 				$result .= '			<key>SSID_STR</key>'
-					. "\n			<string>" . static::e( $network->ssid ) . '</string>'
+					. "\n			<string>" . $this::e( $network->ssid ) . '</string>'
 					. "\n		</dict>"
 					. "\n";
 			} elseif ( $network instanceof NetworkPasspoint ) {
@@ -189,14 +188,14 @@ class AppleMobileconfigFormat extends Format
 					. "\n			<key>ServiceProviderRoamingEnabled</key>"
 					. "\n			<true/>"
 					. "\n			<key>DisplayedOperatorName</key>"
-					. "\n			<string>" . static::e( $this->credential->realm->displayName ) . ' via Passpoint</string>'
+					. "\n			<string>" . $this::e( $this->credential->realm->displayName ) . ' via Passpoint</string>'
 					. "\n			<key>DomainName</key>"
-					. "\n			<string>" . static::e( $this->credential->realm->realmId ) . '</string>'
+					. "\n			<string>" . $this::e( $this->credential->realm->realmId ) . '</string>'
 					. "\n			<key>RoamingConsortiumOIs</key>"
 					. "\n			<array>"
 					. "\n";
 				foreach ( $network->oids as $oid ) {
-					$result .= '				<string>' . \strtoupper( static::e( $oid ) ) . '</string>'
+					$result .= '				<string>' . \strtoupper( $this::e( $oid ) ) . '</string>'
 						. "\n";
 				}
 				$result .= '			</array>'
@@ -206,7 +205,7 @@ class AppleMobileconfigFormat extends Format
 						. "\n			<array>"
 						. "\n";
 					foreach ( $network->naiRealms as $nai ) {
-						$result .= '				<string>' . static::e( $nai ) . '</string>'
+						$result .= '				<string>' . $this::e( $nai ) . '</string>'
 						. "\n";
 					}
 					$result .= '			</array>'

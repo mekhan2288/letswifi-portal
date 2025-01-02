@@ -153,7 +153,7 @@ class GoogleOncFormat extends Format
 	 *
 	 * @return ?array ONC NetworkConfiguration struct
 	 */
-	protected static function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
+	protected function generateNetworkConfiguration( Network $network, string $clientCertID, string $clientCertCN, array $caIDs, string $serverSubjectMatch ): ?array
 	{
 		if ( !$network instanceof NetworkSSID ) {
 			return null;
@@ -163,7 +163,7 @@ class GoogleOncFormat extends Format
 
 		return [
 			'GUID' => $uuid,
-			'Name' => 'eduroam',
+			'Name' => $this->e( $network->displayName ),
 			'ProxySettings' => [
 				'Type' => 'WPAD',
 			],

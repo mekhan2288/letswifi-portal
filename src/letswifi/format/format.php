@@ -11,6 +11,8 @@
 namespace letswifi\format;
 
 use DomainException;
+use fyrkat\multilang\MultiLanguageString;
+use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\credential\Credential;
 
@@ -18,6 +20,7 @@ abstract class Format
 {
 	final public function __construct(
 		protected readonly Credential $credential,
+		protected readonly TranslationContext $translator,
 		protected readonly ?PKCS7 $profileSigner = null,
 		protected readonly ?string $passphrase = null,
 	) {
@@ -26,6 +29,7 @@ abstract class Format
 	public static function getFormatter(
 		string $type,
 		Credential $credential,
+		TranslationContext $translator,
 		?PKCS7 $profileSigner = null,
 		?string $passphrase = null,
 	): self {
@@ -37,7 +41,7 @@ abstract class Format
 			),
 			);
 			if ( !\str_contains( $className, '-' ) && \class_exists( $className ) && \is_subclass_of( $className, self::class ) ) {
-				return new $className( $credential, $profileSigner, $passphrase );
+				return new $className( $credential, $translator, $profileSigner, $passphrase );
 			}
 		}
 
@@ -57,6 +61,9 @@ abstract class Format
 		\header( 'Content-Disposition: attachment; filename="' . $this->getFilename() . '"' );
 		\header( 'Content-Type: ' . $this->getContentType() );
 		\header( 'Content-Length: ' . \strlen( $payload ) );
+		if ( !$this instanceof Pkcs12Format ) {
+			\header( 'Vary: Accept-Language' );
+		}
 
 		exit( $payload );
 	}
@@ -81,8 +88,12 @@ abstract class Format
 
 	abstract public function generate(): string;
 
-	protected static function e( string $s ): string
+	protected function e( string|MultiLanguageString $s ): string
 	{
+		if ( $s instanceof MultiLanguageString ) {
+			$s = $this->translator->translate( $s );
+		}
+
 		return \htmlspecialchars( $s, \ENT_QUOTES, 'UTF-8' );
 	}
 

@@ -16,6 +16,8 @@ use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
+use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
 use letswifi\credential\UserCredentialManager;
@@ -39,6 +41,9 @@ final class LetsWifiApp
 		500 => 'Internal Server Error',
 	];
 
+	/** Fallback locale used when the Accept-Language header was not set */
+	public const FALLBACK_LOCALE = 'en';
+
 	/** @var bool */
 	private $crashing = false;
 
@@ -50,6 +55,8 @@ final class LetsWifiApp
 
 	/** @var TenantConfig */
 	private $tenantConfig;
+
+	private ?TranslationContext $translationContext = null;
 
 	public function __construct( public readonly string $basePath, private readonly LetsWifiConfig $config = new LetsWifiConfig() )
 	{
@@ -117,7 +124,10 @@ final class LetsWifiApp
 
 		$template = $this->getTwig()->load( "{$template}.html" );
 
-		exit( $template->render( ['_basePath' => $basePath] + $data ) );
+		exit( $template->render( [
+			'_basePath' => $basePath,
+			'_lang' => $this->getTranslationContext()->primaryLocale] + $data,
+		) );
 	}
 
 	public static function getHttpHost(): string
@@ -129,19 +139,16 @@ final class LetsWifiApp
 		return $_SERVER['HTTP_HOST'];
 	}
 
-	public function getTwig(): Environment
+	public function getTranslationContext(): TranslationContext
 	{
-		if ( null === $this->twig ) {
-			$loader = new FilesystemLoader(
-				$this->config->getListOrNull( 'tpldir' )
-				?? [\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )],
+		if ( null === $this->translationContext ) {
+			$this->translationContext = new TranslationContext(
+				userLocale: $_COOKIE['lang'] ?? null,
+				localeDirectory: \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'locale',
 			);
-			$this->twig = new Environment( $loader, [
-				// 'cache' => '/path/to/compilation_cache',
-			] );
 		}
 
-		return $this->twig;
+		return $this->translationContext;
 	}
 
 	public function getProvider(): Provider
@@ -200,5 +207,25 @@ final class LetsWifiApp
 		}
 
 		return PKCS7::readChainPEM( $signingCert . "\n" . $signingKey, $passphrase );
+	}
+
+	protected function getTwig(): Environment
+	{
+		if ( null === $this->twig ) {
+			$loader = new FilesystemLoader(
+				[\implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'tpl'] )],
+			);
+			$this->twig = new Environment( $loader, [
+				// 'cache' => '/path/to/compilation_cache',
+			] );
+			$filter = new TwigFilter(
+				't',
+				fn( string $s ) => $this->getTranslationContext()->translateHtml( $s ),
+				['pre_escape' => 'html', 'is_safe' => ['html']],
+			);
+			$this->twig->addFilter( $filter );
+		}
+
+		return $this->twig;
 	}
 }
