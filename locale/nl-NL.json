@@ -25,6 +25,13 @@
 	"Debug info": "Gedetailleerde informatie (informatie tonen is ingeschakeld)",
 	"Contact helpdesk": "Neem contact op met de helpdesk voor hulp",
 
+	"Do you want to issue a pseudo-credential?": "Wil je dit apparaat toegang geven tot het Wi-Fi netwerk via je account?",
+	"Approve": "Goedkeuren",
+	"Why is this needed?": "Waarom is dit nodig?",
+	"Requiring a manual step prevents automated enrollment.": "Een handmatige stap voorkomt dat kwaadwillende programma's zonder jouw medeweten toegang tot het netwerk doorspelen aan anderen.",
+	"Select your user realm": "Kies je realm om verder te gaan",
+	"Continue": "Ga door",
+
 	"Xapple-mobileconfig instructions": "After opening the file on MacOS, install it by going to <strong>System Settings</strong> → <strong>Privacy & Security</strong> → <strong>Profiles</strong>.",
 	"Xgoogle-onc instructions": "After downloading the file, open the Chrome browser and browse to this URL: <a href=\"chrome://network\">chrome://network</a>. Then, use the <strong>Import ONC file</strong> button. The import is silent; the new network definitions will be added to the preferred networks."
 }

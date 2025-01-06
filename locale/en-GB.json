@@ -25,6 +25,13 @@
 	"Debug info": "Detailed error report (due to debug enabled)",
 	"Contact helpdesk": "Contact your helpdesk to get help",
 
+	"Do you want to issue a pseudo-credential?": "Do you want to use your account to connect this device to the Wi-Fi network?",
+	"Approve": "Approve",
+	"Why is this needed?": "Why is this needed?",
+	"Requiring a manual step prevents automated enrollment.": "By clicking approve, you allow the application to receive Wi-Fi profiles on your behalf.",
+	"Select your user realm": "Please select your user group to continue",
+	"Continue": "Continue",
+
 	"apple-mobileconfig instructions": "After opening the file on MacOS, install it by going to <strong>System Settings</strong> → <strong>Privacy & Security</strong> → <strong>Profiles</strong>.",
 	"google-onc instructions": "After downloading the file, open the Chrome browser and browse to this URL: <a href=\"chrome://network\">chrome://network</a>. Then, use the <strong>Import ONC file</strong> button. The import is silent; the new network definitions will be added to the preferred networks."
 }
