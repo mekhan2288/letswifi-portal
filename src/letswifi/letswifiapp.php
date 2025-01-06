@@ -85,7 +85,7 @@ final class LetsWifiApp
 			$code = 500;
 		}
 		$codeExplain = static::HTTP_CODES[$code];
-		$message = $ex::class . ': ' . $ex->getMessage();
+		$message = \preg_replace( '/^.*\\\\/', '', $ex::class ) . ': ' . $ex->getMessage();
 		if ( \PHP_SAPI !== 'cli' && !\headers_sent() ) {
 			\header( 'Content-Type: text/plain', true, $code );
 			if ( !$this->crashing ) {

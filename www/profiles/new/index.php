@@ -97,11 +97,10 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 
 		exit; // should not be reached
 	case 'POST':
+		$realm = null;
 		if ( \array_key_exists( 'realm', $_POST ) ) {
 			$realm = $_POST['realm'];
 			$realm = $user->getRealm( \is_string( $realm ) ? $realm : null );
-		} else {
-			$realm = $user->getRealm();
 		}
 		$passphrase = $overridePassphrase ?? $_POST['passphrase'] ?? null ?: null;
 		\assert( '' !== $passphrase );
@@ -111,6 +110,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
 		}
 		$credentialManager = $app->getUserCredentialLog( user: $user, realm: $realm );
+		// TODO fix hardcoded credential type, should be realm property?
 		$credential = $credentialManager->issue( CertificateCredential::class );
 		$format = $overrideFormat ?? null;
 		foreach ( [$_POST, $_GET] as $candidate ) {
