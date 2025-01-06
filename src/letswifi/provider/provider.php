@@ -13,9 +13,9 @@ namespace letswifi\provider;
 use DomainException;
 use JsonSerializable;
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\Config;
 use letswifi\auth\AuthenticationContext;
 use letswifi\auth\User;
+use letswifi\configuration\Dictionary;
 
 class Provider implements JsonSerializable
 {
@@ -30,6 +30,7 @@ class Provider implements JsonSerializable
 		public readonly array $realmMap,
 		public readonly ?string $contactId = null,
 		public readonly ?MultiLanguageString $description = null,
+		public readonly ?string $profileSigner = null,
 	) {
 	}
 
@@ -44,13 +45,17 @@ class Provider implements JsonSerializable
 		];
 	}
 
-	public static function fromConfig( TenantConfig $tenantConfig, Config $data ): self
+	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $data ): self
 	{
 		$authData = $data->getDictionary( 'auth' );
 		$authService = $authData->getString( 'service' );
-		$oauth = $data->getDictionary( 'oauth' );
 		$authServiceParams = $authData->getRawArray( 'param' );
-		$auth = new AuthenticationContext( $authService, $authServiceParams, $oauth );
+		$auth = new AuthenticationContext(
+			authService: $authService,
+			authServiceParams: $authServiceParams,
+			oauthSecret: $data->getString( 'oauthsecret' ),
+			oauthClients: $data->getRawArray( 'clients' ),
+			pdoData: $data->getDictionary( 'pdo' ) );
 
 		return new self(
 			tenantConfig: $tenantConfig,
@@ -60,6 +65,7 @@ class Provider implements JsonSerializable
 			realmMap: $data->getRawArray( 'realm' ),
 			contactId: $data->getString( 'contact' ),
 			description: $data->getMultiLanguageStringOrNull( 'description' ),
+			profileSigner: $data->getStringOrNull( 'profile-signer' ),
 		);
 	}
 

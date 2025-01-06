@@ -15,7 +15,7 @@ use DomainException;
 use JsonSerializable;
 use fyrkat\multilang\MultiLanguageString;
 use fyrkat\openssl\X509;
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 class Realm implements JsonSerializable
 {
@@ -37,16 +37,16 @@ class Realm implements JsonSerializable
 	) {
 	}
 
-	public static function fromConfig( TenantConfig $tenantConfig, Config $realmData ): self
+	public static function fromConfig( TenantConfig $tenantConfig, Dictionary $realmData ): self
 	{
 		return new self(
 			tenantConfig: $tenantConfig,
 			realmId: $realmData->getParentKey(),
 			displayName: $realmData->getMultiLanguageString( 'display_name' ),
-			serverNames: $realmData->getList( 'server_names' ),
-			trust: $tenantConfig->getCertificatesWithChain( ...$realmData->getList( 'trust' ) ),
-			validity: static::getValidity( $realmData->getNumeric( 'validity' ) ),
-			networks: $tenantConfig->getNetworks( ...$realmData->getList( 'networks' ) ),
+			serverNames: $realmData->getRawArray( 'server_names' ),
+			trust: $tenantConfig->getCertificatesWithChain( ...$realmData->getRawArray( 'trust' ) ),
+			validity: static::getValidity( $realmData->getInteger( 'validity' ) ),
+			networks: $tenantConfig->getNetworks( ...$realmData->getRawArray( 'networks' ) ),
 			description: $realmData->getMultiLanguageStringOrNull( 'description' ),
 			contactId: $realmData->getString( 'contact' ),
 		);

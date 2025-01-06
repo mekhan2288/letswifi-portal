@@ -10,7 +10,6 @@
 
 namespace letswifi;
 
-use PDO;
 use RuntimeException;
 use Throwable;
 use Twig\Environment;
@@ -20,7 +19,7 @@ use Twig\TwigFilter;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
-use letswifi\credential\UserCredentialManager;
+use letswifi\credential\UserCredentialLog;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
 use letswifi\provider\TenantConfig;
@@ -47,16 +46,17 @@ final class LetsWifiApp
 	/** Prevent endless loop if an exception occurs when rendering the error page */
 	private bool $crashing = false;
 
-	private ?PDO $pdo = null;
-
 	private ?Environment $twig = null;
 
 	private TenantConfig $tenantConfig;
 
 	private ?TranslationContext $translationContext = null;
 
-	public function __construct( public readonly string $basePath, private readonly LetsWifiConfig $config = new LetsWifiConfig() )
+	private readonly LetsWifiConfig $config;
+
+	public function __construct( public readonly string $basePath, ?LetsWifiConfig $config = null )
 	{
+		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'provider.php' ) );
 		$this->tenantConfig = new TenantConfig( $this->config );
 	}
 
@@ -153,29 +153,13 @@ final class LetsWifiApp
 		return $this->tenantConfig->getProvider( $this->getHttpHost() );
 	}
 
-	public function getPDO(): PDO
+	public function getUserCredentialLog( User $user, ?Realm $realm ): UserCredentialLog
 	{
-		if ( null === $this->pdo ) {
-			$pdoData = $this->config->getDictionary( 'pdo' );
-			$dsn = $pdoData->getString( 'dsn' );
-			$username = $pdoData->getStringOrNull( 'username' );
-			$password = $pdoData->getStringOrNull( 'password' );
-
-			$this->pdo = new PDO( $dsn, $username, $password );
-			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-		}
-
-		return $this->pdo;
-	}
-
-	public function getUserCredentialManager( User $user, Realm $realm, ?Provider $provider = null ): UserCredentialManager
-	{
-		return new UserCredentialManager(
+		return new UserCredentialLog(
 			user: $user,
-			realm: $realm,
-			provider: $provider ?? $this->getProvider(),
+			realm: $realm ?? $user->getRealm(),
+			provider: $this->getProvider(),
 			config: $this->config,
-			pdo: $this->getPDO(),
 		);
 	}
 
@@ -185,25 +169,19 @@ final class LetsWifiApp
 	 * This is used for signing mobileconfig files, so that Apple OSes don't show a
 	 * big red "not signed" warning when installing the profile.
 	 *
-	 * This function reads both the signing.cert config setting (expecting a path)
-	 * and the profile.signing.cert setting (expecting a payload),
-	 * the latter is preferred.
-	 *
-	 * A config setting profile.signing.passphrase is also used to decode the private key,
-	 * if it is protected by a passphrase.
-	 *
 	 * @return ?PKCS7 if the signer if configured, otherwise NULL
 	 */
 	public function getProfileSigner(): ?PKCS7
 	{
-		$signingCert = $this->config->getStringOrNull( 'profile.signing.cert' );
-		$signingKey = $this->config->getStringOrNull( 'profile.signing.key' );
-		$passphrase = $this->config->getStringOrNull( 'profile.signing.passphrase' );
-		if ( null === $signingCert || null === $signingKey ) {
+		$dn = $this->getProvider()->profileSigner;
+		if ( null === $dn ) {
 			return null;
 		}
+		$data = $this->config->getCertificateData( $dn );
+		$signingCert = $data->getString( 'x509' );
+		$signingKey = $data->getString( 'key' );
 
-		return PKCS7::readChainPEM( $signingCert . "\n" . $signingKey, $passphrase );
+		return PKCS7::readChainPEM( $signingCert . "\n" . $signingKey, null );
 	}
 
 	protected function getTwig(): Environment
@@ -217,7 +195,7 @@ final class LetsWifiApp
 			] );
 			$filter = new TwigFilter(
 				't',
-				fn( string $s ) => $this->getTranslationContext()->translateHtml( $s ),
+				fn( \fyrkat\multilang\MultiLanguageString|string $s ) => $this->getTranslationContext()->translateHtml( $s ),
 				['pre_escape' => 'html', 'is_safe' => ['html']],
 			);
 			$this->twig->addFilter( $filter );

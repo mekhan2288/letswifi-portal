@@ -1,6 +1,10 @@
-/composer.phar
 /etc/*
-!/etc/*.dist.php
+/etc/**/*
+!/etc/*/
+!/etc/*.dist.*
+!/etc/**/*.dist.*
+
+/composer.phar
 /fifo
 /phan.phar
 /php-cs-fixer-v2.phar

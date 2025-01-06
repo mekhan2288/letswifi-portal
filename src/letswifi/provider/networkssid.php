@@ -11,7 +11,7 @@
 namespace letswifi\provider;
 
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 class NetworkSSID extends Network
 {
@@ -23,7 +23,7 @@ class NetworkSSID extends Network
 		parent::__construct( networkId: $networkId, displayName: $displayName );
 	}
 
-	public static function fromConfig( Config $networkConfig ): self
+	public static function fromConfig( Dictionary $networkConfig ): self
 	{
 		return new self(
 			networkId: $networkConfig->getParentKey(),

@@ -11,7 +11,7 @@
 namespace letswifi\provider;
 
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 class Contact
 {
@@ -24,17 +24,17 @@ class Contact
 	) {
 	}
 
-	public static function fromConfig( Config $contactData ): self
+	public static function fromConfig( Dictionary $contactData ): self
 	{
-		$location = $contactData->getDictionary( 'location' );
-		$logo = $contactData->getDictionary( 'logo' );
+		$location = $contactData->getDictionaryOrNull( 'location' );
+		$logo = $contactData->getDictionaryOrNull( 'logo' );
 
 		return new self(
 			mail: $contactData->getMultiLanguageStringOrNull( 'mail' ),
 			web: $contactData->getMultiLanguageStringOrNull( 'web' ),
 			phone: $contactData->getMultiLanguageStringOrNull( 'phone' ),
-			location: Location::fromConfig( $contactData->getDictionary( 'location' ) ),
-			logo: Logo::fromConfig( $contactData->getDictionary( 'logo' ) ),
+			location: null === $location ? null : Location::fromConfig( $location ),
+			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 		);
 	}
 }

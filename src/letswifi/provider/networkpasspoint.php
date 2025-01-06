@@ -11,7 +11,7 @@
 namespace letswifi\provider;
 
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 class NetworkPasspoint extends Network
 {
@@ -28,13 +28,13 @@ class NetworkPasspoint extends Network
 		parent::__construct( networkId: $networkId, displayName: $displayName );
 	}
 
-	public static function fromConfig( Config $networkConfig ): self
+	public static function fromConfig( Dictionary $networkConfig ): self
 	{
 		return new self(
 			networkId: $networkConfig->getParentKey(),
 			displayName: $networkConfig->getMultiLanguageString( 'display_name' ),
-			oids: $networkConfig->getList( 'oid' ),
-			naiRealms: $networkConfig->getListOrEmpty( 'nai' ),
+			oids: $networkConfig->getRawArray( 'oid' ),
+			naiRealms: $networkConfig->has( 'nai' ) ? $networkConfig->getRawArray( 'nai' ) : [],
 		);
 	}
 }

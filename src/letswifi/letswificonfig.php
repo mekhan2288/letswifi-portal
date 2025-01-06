@@ -10,32 +10,36 @@
 
 namespace letswifi;
 
-class LetsWifiConfig extends Config
+class LetsWifiConfig
 {
-	public function getProviderData( string $httpHost ): Config
+	public function __construct( protected readonly configuration\Dictionary $config )
 	{
-		$providers = $this->getDictionary( 'providers' );
+	}
+
+	public function getProviderData( string $httpHost ): configuration\Dictionary
+	{
+		$providers = $this->config->getDictionary( 'provider' );
 
 		return $providers->getDictionaryOrNull( $httpHost ) ?? $providers->getDictionary( '*' );
 	}
 
-	public function getContactData( string $contactId ): Config
+	public function getContactData( string $contactId ): configuration\Dictionary
 	{
-		return $this->getDictionary( 'contact' )->getDictionary( "{$contactId}" );
+		return $this->config->getDictionary( 'contact' )->getDictionary( "{$contactId}" );
 	}
 
-	public function getRealmData( string $realmId ): Config
+	public function getRealmData( string $realmId ): configuration\Dictionary
 	{
-		return $this->getDictionary( 'realm' )->getDictionary( $realmId );
+		return $this->config->getDictionary( 'realm' )->getDictionary( $realmId );
 	}
 
-	public function getCertificateData( string $sub ): Config
+	public function getCertificateData( string $sub ): configuration\Dictionary
 	{
-		return $this->getDictionary( 'certificate' )->getDictionary( $sub );
+		return $this->config->getDictionary( 'certificate' )->getDictionary( $sub );
 	}
 
-	public function getNetworkData( string $network ): Config
+	public function getNetworkData( string $network ): configuration\Dictionary
 	{
-		return $this->getDictionary( 'network' )->getDictionary( $network );
+		return $this->config->getDictionary( 'network' )->getDictionary( $network );
 	}
 }

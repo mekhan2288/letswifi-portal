@@ -10,7 +10,7 @@
 
 namespace letswifi\provider;
 
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 class Location
 {
@@ -18,14 +18,11 @@ class Location
 	{
 	}
 
-	public static function fromConfig( Config $location ): ?self
+	public static function fromConfig( Dictionary $location ): self
 	{
-		$lat = $location->getNumericOrNull( 'lat' );
-		$lon = $location->getNumericOrNull( 'lon' );
-		if ( empty( "{$lat}{$lon}" ) ) {
-			return null;
-		}
+		$lat = $location->getFloat( 'lat' );
+		$lon = $location->getFloat( 'lon' );
 
-		return new self( lat: (float)$lat, lon: (float)$lon );
+		return new self( lat: $lat, lon: $lon );
 	}
 }

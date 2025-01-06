@@ -12,7 +12,7 @@ namespace letswifi\provider;
 
 use DomainException;
 use fyrkat\multilang\MultiLanguageString;
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 abstract class Network
 {
@@ -23,14 +23,16 @@ abstract class Network
 	/**
 	 * @return array<Network>
 	 */
-	public static function allFromConfig( Config $networkConfig ): array
+	public static function allFromConfig( Dictionary $networkConfig ): array
 	{
 		$result = [];
-		if ( null !== $networkConfig->getStringOrNull( 'ssid' ) ) {
+		if ( $networkConfig->has( 'ssid' ) ) {
 			$result[] = NetworkSSID::fromConfig( $networkConfig );
-		} elseif ( null !== $networkConfig->getStringOrNull( 'oid' ) ) {
+		}
+		if ( $networkConfig->has( 'oid' ) ) {
 			$result[] = NetworkPasspoint::fromConfig( $networkConfig );
-		} else {
+		}
+		if ( empty( $result ) ) {
 			throw new DomainException( \sprintf( 'Incomplete network %s', $networkConfig->getParentKey() ) );
 		}
 

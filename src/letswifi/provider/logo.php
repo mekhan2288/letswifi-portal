@@ -12,7 +12,7 @@ namespace letswifi\provider;
 
 use Closure;
 use DomainException;
-use letswifi\Config;
+use letswifi\configuration\Dictionary;
 
 class Logo
 {
@@ -23,14 +23,27 @@ class Logo
 	{
 	}
 
-	public static function fromConfig( Config $logo ): ?self
+	public static function fromConfig( Dictionary $logo ): ?self
 	{
+		if ( !$logo->has( 'data' ) ) {
+			return null;
+		}
 		$contentType = $logo->getStringOrNull( 'content_type' );
+		if ( null === $contentType && isset( $logo['data#file'] ) ) {
+			$ext = \preg_replace( '/^.*\\./', '', $logo['data#file'] );
+
+			switch ( $ext ) {
+				case 'jpg':
+				case 'jpeg': $contentType = 'image/jpeg'; break;
+				case 'png': $contentType = 'image/png'; break;
+				case 'svg': $contentType = 'image/svg+xml'; break;
+			}
+		}
 		if ( null === $contentType ) {
 			return null;
 		}
 
-		return new self( imageGenerator: static fn(): string => $logo->getString( 'bytes' ), contentType: $contentType );
+		return new self( imageGenerator: static fn(): string => $logo->getString( 'data' ), contentType: $contentType );
 	}
 
 	public function getBytes(): string

@@ -26,18 +26,19 @@ use letswifi\auth\User;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
 
-class UserCredentialManager
+class UserCredentialLog
 {
 	public const DATE_FORMAT = 'Y-m-d H:i:s';
 
 	public readonly Realm $realm;
+
+	private ?PDO $pdo = null;
 
 	public function __construct(
 		public readonly User $user,
 		Realm|string $realm,
 		public readonly Provider $provider,
 		private readonly LetsWifiConfig $config,
-		private readonly PDO $pdo,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
 		// Ensure that the realm is one that is available for this user
@@ -78,7 +79,7 @@ class UserCredentialManager
 	private function logPreparedUserCredential( X509 $caCert, CSR $csr, DateTimeInterface $expiry, string $usage ): int
 	{
 		$csrData = $csr->getCSRPem();
-		$statement = $this->pdo->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr, :client, :user_agent, :ip)' );
+		$statement = $this->getPDO()->prepare( 'INSERT INTO `realm_signing_log` (`realm`, `ca_sub`, `requester`, `usage`, `sub`, `issued`, `expires`, `csr`, `client`, `user_agent`, `ip`) VALUES (:realm, :ca_sub, :requester, :usage, :sub, :issued, :expires, :csr, :client, :user_agent, :ip)' );
 		$statement->bindValue( 'realm', $this->realm->realmId, PDO::PARAM_STR );
 		$statement->bindValue( 'ca_sub', $caCert->getSubject(), PDO::PARAM_STR );
 		$statement->bindValue( 'requester', $this->user->userId, PDO::PARAM_STR );
@@ -91,7 +92,7 @@ class UserCredentialManager
 		$statement->bindValue( 'user_agent', $this->user->userAgent, PDO::PARAM_STR );
 		$statement->bindValue( 'ip', $this->user->ip, PDO::PARAM_STR );
 		$statement->execute();
-		$last = $this->pdo->lastInsertId();
+		$last = $this->getPDO()->lastInsertId();
 		$lastId = (int)$last;
 		if ( 0 < $lastId && (string)$lastId === $last ) {
 			return $lastId;
@@ -106,7 +107,7 @@ class UserCredentialManager
 	 */
 	private function logCompletedUserCredential( X509 $userCert, string $usage ): void
 	{
-		$statement = $this->pdo->prepare( 'UPDATE `realm_signing_log` SET `issued` = :issued, `expires` = :expires, `x509` = :x509 WHERE `serial` = :serial AND `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `ca_sub` = :ca_sub' );
+		$statement = $this->getPDO()->prepare( 'UPDATE `realm_signing_log` SET `issued` = :issued, `expires` = :expires, `x509` = :x509 WHERE `serial` = :serial AND `realm` = :realm AND `requester` = :requester AND `usage` = :usage AND `ca_sub` = :ca_sub' );
 		$statement->bindValue( 'issued', \gmdate( static::DATE_FORMAT, $userCert->getValidFrom()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'expires', \gmdate( static::DATE_FORMAT, $userCert->getValidTo()->getTimestamp() ), PDO::PARAM_STR );
 		$statement->bindValue( 'x509', $userCert->getX509Pem(), PDO::PARAM_STR );
@@ -131,17 +132,34 @@ class UserCredentialManager
 		$commonName = static::createCommonName( '@' . \rawurlencode( $this->realm->realmId ) );
 		$dn = new DN( ['CN' => $commonName] );
 		$csr = CSR::generate( $dn, $userKey );
-		$signerDN = $this->config->getRealmData( $this->realm->realmId )->getString( 'signer' );
-		$signerData = $this->config->getCertificateData( $signerDN );
+
+		$signerData = $this->config->getCertificateData( $this->config->getRealmData( $this->realm->realmId )->getString( 'signer' ) );
 		$caCert = new X509( $signerData->getString( 'x509' ) );
+
 		$serial = $this->logPreparedUserCredential( $caCert, $csr, $expiry, 'client' );
 
 		$caKey = new PrivateKey( $signerData->getString( 'key' ), $signerData->getStringOrNull( 'passphrase' ) );
+
 		$conf = new OpenSSLConfig( x509Extensions: OpenSSLConfig::X509_EXTENSION_CLIENT );
 		$userCert = $csr->sign( $caCert, $caKey, $expiry, $conf, $serial );
 		$this->logCompletedUserCredential( $userCert, 'client' );
 
 		return new PKCS12( $userCert, $userKey, [$caCert] );
+	}
+
+	private function getPDO(): PDO
+	{
+		if ( null === $this->pdo ) {
+			$pdoData = $this->config->getProviderData( $this->provider->host )->getDictionary( 'pdo' );
+			$dsn = $pdoData->getString( 'dsn' );
+			$username = $pdoData->getStringOrNull( 'username' );
+			$password = $pdoData->getStringOrNull( 'password' );
+
+			$this->pdo = new PDO( $dsn, $username, $password );
+			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+		}
+
+		return $this->pdo;
 	}
 
 	private function issueCertificateCredential(): CertificateCredential

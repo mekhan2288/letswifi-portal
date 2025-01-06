@@ -23,23 +23,27 @@ use fyrkat\oauth\token\AccessToken;
 use fyrkat\oauth\token\AuthorizationCode;
 use fyrkat\oauth\token\Grant;
 use fyrkat\oauth\token\RefreshToken;
-use letswifi\Config;
 use letswifi\auth\browser\BrowserAuthInterface;
+use letswifi\configuration\Dictionary;
 use letswifi\provider\Provider;
 use letswifi\provider\Realm;
 
 class AuthenticationContext implements JsonSerializable
 {
-	public readonly string $kid;
-
 	public readonly BrowserAuthInterface $browserAuth;
 
 	public readonly OAuth $oauth;
 
+	/**
+	 * @param array<string,mixed>                                                                                               $authServiceParams
+	 * @param array<array{clientId:string,redirectUris?:array<string>,scopes:array<string>,refresh?:bool,clientSecret?:string}> $oauthClients
+	 */
 	public function __construct(
 		public readonly string $authService,
 		array $authServiceParams,
-		Config $oauth,
+		string $oauthSecret,
+		array $oauthClients,
+		Dictionary $pdoData,
 		protected readonly DateTimeImmutable $now = new DateTimeImmutable(),
 	) {
 		if ( !\preg_match( '/^[A-Z][A-Za-z0-9]+$/', $authService ) ) {
@@ -48,36 +52,29 @@ class AuthenticationContext implements JsonSerializable
 		$authService = "letswifi\\auth\\browser\\{$authService}";
 		$browserAuth = new $authService( ...$authServiceParams );
 		\assert( $browserAuth instanceof BrowserAuthInterface );
+		$this->browserAuth = $browserAuth;
 
-		foreach ( $oauth->getRawArray( 'keys' ) as $kid => $o ) {
-			// TODO Use kid, issued and expiry fields in a better way
-			if ( $now->getTimestamp() > $o['iss'] ) {
-				$oauthSecret = \base64_decode( $o['key'], true );
-				break;
-			}
-		}
-		if ( !isset( $oauthSecret ) || !\is_string( $oauthSecret ) || !isset( $kid ) ) {
-			throw new DomainException( 'No appropriate oauth key available' );
-		}
-
-		$pdoData = $oauth->getDictionary( 'pdo' );
-		$dsn = $pdoData->getString( 'dsn' );
-		$username = $pdoData->getStringOrNull( 'username' );
-		$password = $pdoData->getStringOrNull( 'password' );
-
-		$pdo = new PDO( $dsn, $username, $password );
+		$pdo = new PDO(
+			$pdoData->getString( 'dsn' ),
+			$pdoData->getStringOrNull( 'username' ),
+			$pdoData->getStringOrNull( 'password' ),
+		);
 		$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
+		if ( \strlen( $oauthSecret ) === 44 || \strlen( $oauthSecret ) === 43 ) {
+			$oauthSecret = \base64_decode( \strtr( $oauthSecret, '_-', '/+' ), true );
+		}
 		$accessTokenSealer = new JWTSealer( AccessToken::class, $oauthSecret );
 		$authorizationCodeSealer = new JWTSealer( AuthorizationCode::class, $oauthSecret );
 		$refreshTokenSealer = new PDOSealer( RefreshToken::class, $pdo );
 
 		/** @psalm-suppress ArgumentTypeCoercion */
-		$this->oauth = new OAuth( $accessTokenSealer, $authorizationCodeSealer, $refreshTokenSealer );
-		$this->kid = $kid;
-		$this->browserAuth = $browserAuth;
+		$this->oauth = new OAuth(
+			$accessTokenSealer,
+			$authorizationCodeSealer,
+			$refreshTokenSealer,
+		);
 
-		foreach ( $oauth->getRawArray( 'clients' ) as $client ) {
+		foreach ( $oauthClients as $client ) {
 			$this->oauth->registerClient( new Client(
 				$client['clientId'],
 				$client['redirectUris'] ?? [],

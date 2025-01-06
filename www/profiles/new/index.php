@@ -110,8 +110,7 @@ switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 
 			exit( "400 Bad Request\r\n\r\nInvalid passphrase\r\n" );
 		}
-		$credentialManager = $app->getUserCredentialManager( user: $user, realm: $realm );
-		// TODO fix hardcoded credential type
+		$credentialManager = $app->getUserCredentialLog( user: $user, realm: $realm );
 		$credential = $credentialManager->issue( CertificateCredential::class );
 		$format = $overrideFormat ?? null;
 		foreach ( [$_POST, $_GET] as $candidate ) {
