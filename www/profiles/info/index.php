@@ -19,7 +19,15 @@ $provider = $app->getProvider();
 $profileInfo = (array)$provider->getContact();
 $profileInfo['displayName'] = $provider->displayName;
 $profileInfo['description'] = $provider->description;
-
+if ( null !== $profileInfo['logo'] ) {
+	$vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
+	\assert( \is_string( $vhost ), 'HTTP_HOST should be string' );
+	$issuer = "https://{$vhost}";
+	$uri = \array_key_exists( 'REQUEST_URI', $_SERVER ) ? $_SERVER['REQUEST_URI'] : null;
+	\assert( \is_string( $uri ), 'REQUEST_URI should be string' );
+	$indexUri = \dirname( "{$uri}x" );
+	$profileInfo['logo']->href = "{$issuer}{$indexUri}/logo.php";
+}
 $app->render(
 	[
 		'href' => "{$basePath}/profiles/info/",
