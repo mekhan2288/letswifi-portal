@@ -3,13 +3,19 @@
 	// at least one language must be provided.
 	// Will be used as title in choice menus, profile installation, etc.
 	// REQUIRED: Array language => name
-	'display_name' => ['en-GB' => 'Student'],
+	'display_name' => [
+		'en-GB' => 'Student',
+		'nl-NL' => 'Student',
+	],
 
 	// Longer descriptive name of the realm; multi-language.
 	// at least one language must be provided.
 	// Will be used as title in choice menus, profile installation, etc.
 	// OPTIONAL: Array language => name
-	'description' => ['en-GB' => 'Network for students'],
+	'description' => [
+		'en-GB' => 'Network for students',
+		'nl-NL' => 'Netwerk voor studenten',
+	],
 
 	// The client requires that the RADIUS server presents a certificate
 	// containing at least one of these server names.

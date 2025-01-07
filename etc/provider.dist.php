@@ -15,6 +15,7 @@
 			// REQUIRED: Array language => name
 			'display_name' => [
 				'en-GB' => 'Default provider',
+				'nl-NL' => 'Standaard provider',
 			],
 
 			// Longer descriptive name of the provider; multi-language.
@@ -23,6 +24,7 @@
 			// OPTIONAL: Array language => name
 			'description' => [
 				'en-GB' => 'The default provider',
+				'nl-NL' => 'De standaard provider',
 			],
 
 			// List of realms that are available to this provider.

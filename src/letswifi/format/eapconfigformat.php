@@ -37,12 +37,10 @@ class EapConfigFormat extends Format
 		if ( \count( $locales ) > 0 ) {
 			$locale = \reset( $locales )->is( ...$locales ) ? \reset( $locales ) : null;
 		}
-		$lang = null === $locale ? '' : "lang=\"{$locale}\" ";
-
 		$result = '<?xml version="1.0" encoding="utf-8"?>';
 		$result .= ''
 			. "\r\n" . '<EAPIdentityProviderList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="eap-metadata.xsd">'
-			. "\r\n\t" . '<EAPIdentityProvider ID="' . $this->e( $this->credential->realm->realmId ) . "\" namespace=\"urn:RFC4282:realm\" {$lang}version=\"1\">";
+			. "\r\n\t" . '<EAPIdentityProvider ID="' . $this->e( $this->credential->realm->realmId ) . '" namespace="urn:RFC4282:realm" version="1">';
 		if ( null !== $expiry = $this->credential->getExpiry() ) {
 			$result .= ''
 				. "\r\n\t\t<ValidUntil>" . $this->e( \gmdate( 'Y-m-d\\TH:i:s\\Z', $expiry->getTimestamp() ) ) . '</ValidUntil>';
@@ -60,11 +58,14 @@ class EapConfigFormat extends Format
 		}
 		$result .= ''
 			. "\r\n\t\t</CredentialApplicability>"
-			. "\r\n\t\t<ProviderInfo>"
-			. "\r\n\t\t\t<DisplayName>" . $this->e( $this->credential->realm->displayName ) . '</DisplayName>';
-		if ( null !== $this->credential->realm->description ) {
+			. "\r\n\t\t<ProviderInfo>";
+		foreach ( $this->credential->realm->displayName->jsonSerialize() as $data ) {
 			$result .= ''
-				. "\r\n\t\t\t<Description>" . $this->e( $this->credential->realm->description ) . '</Description>';
+				. "\r\n\t\t\t<DisplayName lang=\"" . $this->e( $data['lang'] ) . '">' . $this->e( $data['display'] ) . '</DisplayName>';
+		}
+		foreach ( $this->credential->realm->description?->jsonSerialize() ?? [] as $data ) {
+			$result .= ''
+				. "\r\n\t\t\t<Description lang=\"" . $this->e( $data['lang'] ) . '">' . $this->e( $data['display'] ) . '</Description>';
 		}
 		if ( null !== $location = $this->credential->provider->getContact()?->location ) {
 			$result .= $this->generateLocationXml( $location );

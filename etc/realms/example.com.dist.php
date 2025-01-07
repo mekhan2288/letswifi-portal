@@ -3,13 +3,19 @@
 	// at least one language must be provided.
 	// Will be used as title in choice menus, profile installation, etc.
 	// REQUIRED: Array language => name
-	'display_name' => ['en-GB' => 'Example'],
+	'display_name' => [
+		'en-GB' => 'Example',
+		'nl-NL' => 'Voorbeeld',
+	],
 
 	// Longer descriptive name of the realm; multi-language.
 	// at least one language must be provided.
 	// Will be used as title in choice menus, profile installation, etc.
 	// OPTIONAL: Array language => name
-	'description' => ['en-GB' => 'The example realm'],
+	'description' => [
+		'en-GB' => 'The example realm',
+		'nl-NL' => 'De voorbeeldrealm',
+	],
 
 	// The client requires that the RADIUS server presents a certificate
 	// containing at least one of these server names.
