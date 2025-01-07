@@ -102,7 +102,7 @@ class AuthenticationContext implements JsonSerializable
 				return $force ? throw $e : null;
 			}
 		} else {
-			$userId = $force ? $this->browserAuth->getUserId() : $this->browserAuth->requireAuth();
+			$userId = $force ? $this->browserAuth->requireAuth() : $this->browserAuth->getUserId();
 
 			return null !== $userId ? $this->constructAuthenticatedUser( $provider, $userId ) : null;
 		}
