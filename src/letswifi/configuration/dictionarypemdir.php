@@ -17,4 +17,12 @@ class DictionaryPemDir extends DictionaryDir
 
 	/** @var string */
 	protected const EXTENSION = 'pem';
+
+	public function __construct( string $dir, ?string $extension = null )
+	{
+		parent::__construct( $dir, $extension );
+		if ( \fileperms( $dir ) & 0o77 ) {
+			throw new ConfigurationException( "Directory {$dir} has too wide permissions" );
+		}
+	}
 }

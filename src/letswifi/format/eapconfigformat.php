@@ -25,18 +25,6 @@ class EapConfigFormat extends Format
 {
 	public function generate(): string
 	{
-		$contact = $this->credential->provider->getContact();
-		$locales = \array_filter( \array_map( [$this, 'getLocale'], \array_filter( [
-			$this->credential->realm->displayName,
-			$this->credential->realm->description,
-			$contact?->mail,
-			$contact?->web,
-			$contact?->phone,
-		] ) ) );
-		$locale = null;
-		if ( \count( $locales ) > 0 ) {
-			$locale = \reset( $locales )->is( ...$locales ) ? \reset( $locales ) : null;
-		}
 		$result = '<?xml version="1.0" encoding="utf-8"?>';
 		$result .= ''
 			. "\r\n" . '<EAPIdentityProviderList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="eap-metadata.xsd">'
@@ -72,7 +60,7 @@ class EapConfigFormat extends Format
 		}
 		if ( null !== $logo = $this->credential->provider->getContact()?->logo ) {
 			$result .= ''
-				. "\r\n\t\t\t" . '<ProviderLogo mime="' . $this->e( $logo->contentType ) . '" encoding="base64">' . \base64_encode( $logo->getBytes() ) . '</ProviderLocation>';
+				. "\r\n\t\t\t" . '<ProviderLogo mime="' . $this->e( $logo->contentType ) . '" encoding="base64">' . \base64_encode( $logo->getBytes() ) . '</ProviderLogo>';
 		}
 		/*
 		if ( null !== $tos = $this->profileData->getTermsOfUse() ) {
@@ -80,7 +68,7 @@ class EapConfigFormat extends Format
 				. "\r\n\t\t\t" . '<TermsOfUse>' . $this->e( $tos ) . '</TermsOfUse>';
 		}
 		 */
-		if ( null !== $contact ) {
+		if ( null !== $contact = $this->credential->provider->getContact() ) {
 			$result .= $this->generateHelpdeskXml( $contact );
 		}
 		$result .= ''

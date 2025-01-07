@@ -220,22 +220,16 @@
 		// Free-text key, must be referenced from provider or realm
 		'example.com' => [
 			// E-mail address for support
-			// OPTIONAL: Array language => name
-			'mail' => [
-				'en-GB' => 'mailto:contact@example.com',
-			],
+			// String e-mail address
+			'mail' => 'contact@example.com',
 
 			// Website address for support
 			// OPTIONAL: Array language => name
-			'web' => [
-				'en-GB' => 'https://support.example.com',
-			],
+			'web' => 'https://support.example.com',
 
 			// Website address for support
 			// OPTIONAL: Array language => name
-			'phone' => [
-				'en-GB' => 'tel:+1555eduroam',
-			],
+			'phone' => '+1555eduroam',
 
 			// Location of the venue in lat/lon
 			// This data, if provided, is included in the API and in eap-config files,

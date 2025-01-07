@@ -10,15 +10,14 @@
 
 namespace letswifi\provider;
 
-use fyrkat\multilang\MultiLanguageString;
 use letswifi\configuration\Dictionary;
 
 class Contact
 {
 	public function __construct(
-		public readonly ?MultiLanguageString $mail = null,
-		public readonly ?MultiLanguageString $web = null,
-		public readonly ?MultiLanguageString $phone = null,
+		public readonly ?string $mail = null,
+		public readonly ?string $web = null,
+		public readonly ?string $phone = null,
 		public readonly ?Location $location = null,
 		public readonly ?Logo $logo = null,
 	) {
@@ -30,9 +29,9 @@ class Contact
 		$logo = $contactData->getDictionaryOrNull( 'logo' );
 
 		return new self(
-			mail: $contactData->getMultiLanguageStringOrNull( 'mail' ),
-			web: $contactData->getMultiLanguageStringOrNull( 'web' ),
-			phone: $contactData->getMultiLanguageStringOrNull( 'phone' ),
+			mail: $contactData->getStringOrNull( 'mail' ),
+			web: $contactData->getStringOrNull( 'web' ),
+			phone: $contactData->getStringOrNull( 'phone' ),
 			location: null === $location ? null : Location::fromConfig( $location ),
 			logo: null === $logo ? null : Logo::fromConfig( $logo ),
 		);
