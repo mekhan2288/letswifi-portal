@@ -66,11 +66,11 @@
 
 			// Database for logging pseudocredentials and OAuth credentials
 			// REQUIRED: Array containing dsn, username and password
-			'pdo#inc' => 'database.php',
+			'pdo#inc' => 'database.conf.php',
 
 			// List of OAuth clients that are allowed to use the API
 			// REQUIRED: Array
-			'clients#inc' => 'clients.php',
+			'clients#inc' => 'clients.conf.php',
 
 			// OAuth shared secret
 			// REQUIRED: String
@@ -194,7 +194,8 @@
 			// the profile was generated decides the name being used in the profile.
 			// REQUIRED: Array language => name
 			'display_name' => [
-				'en-GB' => 'eduroam'
+				'en-GB' => 'eduroam',
+				'nl-NL' => 'eduroam',
 			],
 
 			// SSID to configure for the network profile on the client.
@@ -222,21 +223,24 @@
 			// E-mail address for support
 			// String e-mail address
 			'mail' => 'contact@example.com',
+			'mail' => null, // REMOVE THIS LINE
 
 			// Website address for support
 			// OPTIONAL: Array language => name
 			'web' => 'https://support.example.com',
+			'web' => null, // REMOVE THIS LINE
 
 			// Website address for support
 			// OPTIONAL: Array language => name
 			'phone' => '+1555eduroam',
+			'phone' => null, // REMOVE THIS LINE
 
 			// Location of the venue in lat/lon
 			// This data, if provided, is included in the API and in eap-config files,
 			// but currently it's not being used for anything.
 			// OPTIONAL: Array with lat: float, lon: float
 			'location' => ['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
-			'location' => null,
+			'location' => null, // REMOVE THIS LINE
 
 			// Logo for the provider or realm
 			// This will be displayed prominent in the apps
@@ -254,6 +258,7 @@
 				// OPTIONAL: String
 				'content_type' => null,
 			],
+			'logo' => null, // REMOVE THIS LINE
 		],
 	],
 

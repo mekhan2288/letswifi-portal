@@ -12,7 +12,7 @@ camera-ready: syntax codestyle phpunit psalm
 	# https://github.com/phan/phan/issues/4887
 .PHONY: camera-ready
 
-dev: check-php etc/letswifi.conf.php vendor
+dev: check-php etc/tenant.conf.php vendor
 	@test -f var/letswifi-dev.sqlite || make var/letswifi-dev.sqlite
 	$(PHP) -S [::1]:1080 -t www/
 .PHONY: dev
@@ -38,8 +38,8 @@ vendor: composer.json check-php composer.phar
 composer.lock: composer.json check-php composer.phar
 	$(PHP) composer.phar update
 
-etc/letswifi.conf.php:
-	cp etc/letswifi.conf.dist.php etc/letswifi.conf.php
+etc/tenant.conf.php:
+	cp etc/tenant.conf.dist.php etc/tenant.conf.php
 
 var:
 	mkdir -p var
@@ -53,7 +53,7 @@ var/letswifi-dev.sqlite: var
 	$(PHP) bin/add-realm.php $(REALM) 1 || { rm var/letswifi-dev.sqlite && false; }
 
 simplesamlphp:
-	-cp -n etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
+	-cp -n etc/tenant.conf.simplesaml.php etc/tenant.conf.php
 	curl -sSL https://github.com/simplesamlphp/simplesamlphp/releases/download/v$(SIMPLESAMLPHP_VERSION)/simplesamlphp-$(SIMPLESAMLPHP_VERSION)-$(SIMPLESAMLPHP_FLAVOUR).tar.gz | tar xzf -
 	ln -sf simplesamlphp-$(SIMPLESAMLPHP_VERSION)/ simplesamlphp || true
 	ln -sf ../simplesamlphp/public/ www/simplesaml || true

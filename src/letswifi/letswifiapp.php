@@ -56,7 +56,7 @@ final class LetsWifiApp
 
 	public function __construct( public readonly string $basePath, ?LetsWifiConfig $config = null )
 	{
-		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'provider.php' ) );
+		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' ) );
 		$this->tenantConfig = new TenantConfig( $this->config );
 	}
 

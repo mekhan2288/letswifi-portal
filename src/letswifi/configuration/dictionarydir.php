@@ -18,7 +18,7 @@ class DictionaryDir extends DictionaryFile
 	protected const SIGIL = '#inc';
 
 	/** @var string */
-	protected const EXTENSION = 'php';
+	protected const EXTENSION = 'conf.php';
 
 	public readonly string $extension;
 
