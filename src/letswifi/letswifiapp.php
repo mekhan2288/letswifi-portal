@@ -177,11 +177,16 @@ final class LetsWifiApp
 		if ( null === $dn ) {
 			return null;
 		}
-		$data = $this->config->getCertificateData( $dn );
-		$signingCert = $data->getString( 'x509' );
-		$signingKey = $data->getString( 'key' );
 
-		return PKCS7::readChainPEM( $signingCert . "\n" . $signingKey, null );
+		$data = $this->config->getCertificateData( $dn );
+		$signingKey = $data->getString( 'key' );
+		$signingCert = '';
+		do {
+			$signingCert .= $data->getString( 'x509' );
+			$data = $this->config->getCertificateData( $data->getString( 'issuer' ) );
+		} while ( $data->has( 'issuer' ) );
+
+		return PKCS7::readChainPEM( "{$signingCert}{$signingKey}", null );
 	}
 
 	protected function getTwig(): Environment
