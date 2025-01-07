@@ -13,8 +13,8 @@ namespace letswifi\format;
 use InvalidArgumentException;
 use fyrkat\openssl\X509;
 use letswifi\credential\CertificateCredential;
-use letswifi\provider\NetworkPasspoint;
-use letswifi\provider\NetworkSSID;
+use letswifi\tenant\NetworkPasspoint;
+use letswifi\tenant\NetworkSSID;
 
 class AppleMobileconfigFormat extends Format
 {

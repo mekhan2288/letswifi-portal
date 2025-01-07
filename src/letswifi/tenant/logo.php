@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-namespace letswifi\provider;
+namespace letswifi\tenant;
 
 use Closure;
 use DomainException;

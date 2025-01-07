@@ -20,9 +20,9 @@ use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
 use letswifi\credential\UserCredentialLog;
-use letswifi\provider\Provider;
-use letswifi\provider\Realm;
-use letswifi\provider\TenantConfig;
+use letswifi\tenant\Provider;
+use letswifi\tenant\Realm;
+use letswifi\tenant\TenantConfig;
 
 final class LetsWifiApp
 {

@@ -14,8 +14,8 @@ use Closure;
 use DateTimeInterface;
 use fyrkat\openssl\PKCS12;
 use letswifi\auth\User;
-use letswifi\provider\Provider;
-use letswifi\provider\Realm;
+use letswifi\tenant\Provider;
+use letswifi\tenant\Realm;
 
 class CertificateCredential extends Credential
 {

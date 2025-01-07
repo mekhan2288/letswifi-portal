@@ -23,8 +23,8 @@ use fyrkat\openssl\PrivateKey;
 use fyrkat\openssl\X509;
 use letswifi\LetsWifiConfig;
 use letswifi\auth\User;
-use letswifi\provider\Provider;
-use letswifi\provider\Realm;
+use letswifi\tenant\Provider;
+use letswifi\tenant\Realm;
 
 class UserCredentialLog
 {

@@ -11,7 +11,7 @@
 namespace letswifi\auth;
 
 use DomainException;
-use letswifi\provider\Realm;
+use letswifi\tenant\Realm;
 
 class User
 {
