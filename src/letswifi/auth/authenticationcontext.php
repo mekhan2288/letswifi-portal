@@ -63,6 +63,10 @@ class AuthenticationContext implements JsonSerializable
 		if ( \strlen( $oauthSecret ) === 44 || \strlen( $oauthSecret ) === 43 ) {
 			$oauthSecret = \base64_decode( \strtr( $oauthSecret, '_-', '/+' ), true );
 		}
+		if ( empty( \trim( $oauthSecret, "\0" ) ) ) {
+			throw new DomainException( 'NULL OAuth secret provided' );
+		}
+
 		$accessTokenSealer = new JWTSealer( AccessToken::class, $oauthSecret );
 		$authorizationCodeSealer = new JWTSealer( AuthorizationCode::class, $oauthSecret );
 		$refreshTokenSealer = new PDOSealer( RefreshToken::class, $pdo );

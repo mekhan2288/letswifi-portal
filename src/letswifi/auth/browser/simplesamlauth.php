@@ -33,7 +33,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 	 * @param array<string,array<string>|string> $authzAttributeValue
 	 * @param array<string>                      $allowedHomeOrgs
 	 */
-	public function __construct( array $params,
+	public function __construct(
 		string $authSource = 'default-sp',
 		public readonly ?string $userIdAttribute = null,
 		public readonly ?string $affiliationAttribute = 'eduPersonAffiliation',
@@ -46,7 +46,7 @@ class SimpleSAMLAuth implements BrowserAuthInterface
 		public readonly ?string $autoloadInclude = null,
 	) {
 		if ( null !== $autoloadInclude ) {
-			require $params['autoloadInclude'];
+			require $autoloadInclude;
 		}
 		$this->as = new Simple( $authSource );
 	}
