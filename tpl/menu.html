@@ -16,7 +16,7 @@
 {% else %}
 		<li><a href="{{ _basePath ~ menuItem.href }}">
 {% endif %}
-		{{ menuItem.name|t }}</a></li>
+		{{ t(menuItem.name) }}</a></li>
 {% endfor %}
 	</ul>
 </nav>

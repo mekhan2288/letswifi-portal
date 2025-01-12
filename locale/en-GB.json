@@ -25,6 +25,8 @@
 	"Debug info": "Detailed error report (due to debug enabled)",
 	"Contact helpdesk": "Contact your helpdesk to get help",
 
+	"Not %s?": "Not %s?",
+
 	"Do you want to issue a pseudo-credential?": "Do you want to use your account to connect this device to the Wi-Fi network?",
 	"Approve": "Approve",
 	"Why is this needed?": "Why is this needed?",

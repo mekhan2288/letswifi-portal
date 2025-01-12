@@ -15,7 +15,7 @@ use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader;
-use Twig\TwigFilter;
+use Twig\TwigFunction;
 use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
@@ -198,12 +198,14 @@ final class LetsWifiApp
 			$this->twig = new Environment( $loader, [
 				// 'cache' => '/path/to/compilation_cache',
 			] );
-			$filter = new TwigFilter(
+			$filter = new TwigFunction(
 				't',
-				fn( \fyrkat\multilang\MultiLanguageString|string $s ) => $this->getTranslationContext()->translateHtml( $s ),
-				['pre_escape' => 'html', 'is_safe' => ['html']],
+				fn(
+					\fyrkat\multilang\MultiLanguageString|string $s, mixed ...$values,
+				) => \sprintf( $this->getTranslationContext()->translateHtml( $s ), ...$values ),
+				['is_safe' => ['html']],
 			);
-			$this->twig->addFilter( $filter );
+			$this->twig->addFunction( $filter );
 		}
 
 		return $this->twig;

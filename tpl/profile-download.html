@@ -1,19 +1,19 @@
 {% extends "dialog.html" %}
 
-{% block title %}{{ 'Profile download'|t }}{% endblock %}
+{% block title %}{{ t('Profile download') }}{% endblock %}
 
 {% block content %}
 <main>
 <h1>geteduroam<small>– eduroam authentication made easy</small></h1>
 <form method="POST" action="{{ action }}" id="form-download">
 {% if realms|length == 1 %}
-<p>{{ 'Download starting'|t }}</p>
+<p>{{ t('Download starting') }}</p>
 <details>
-	<summary>{{ 'Download not starting?'|t }}</summary>
+	<summary>{{ t('Download not starting?') }}</summary>
 {% else %}
 {% include 'realm-picker.html' %}
 {% endif %}
-	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ 'Start download'|t }}</button></p>
+	<p><input type="hidden" name="format" value="{{ format }}"><button type="submit" class="btn btn-default" id="btn-download">{{ t('Start download') }}</button></p>
 </form>
 {% if realms|length == 1 %}
 </details>
@@ -21,13 +21,13 @@
 <hr>
 
 {% if passphrase %}
-<p>{{ 'Use passphrase when prompted:'|t }}</p>
+<p>{{ t('Use passphrase when prompted:') }}</p>
 <p id="passphrase-show">{{ passphrase }}</p>
 <hr>
 {% endif %}
 
 {% if format == 'apple-mobileconfig' %}
-<p>{{ 'apple-mobileconfig instructions'|t }}</p>
+<p>{{ t('apple-mobileconfig instructions') }}</p>
 <p aria-hidden="true">
 	<picture class="screenshot mac">
 	<source srcset="{{ _basePath }}/assets/mac/sonoma-dark.png" media="(prefers-color-scheme: dark)">
@@ -37,7 +37,7 @@
 {% endif %}
 
 {% if format == 'google-onc' %}
-<p>{{ 'google-onc instructions'|t }}</p>
+<p>{{ t('google-onc instructions') }}</p>
 {% endif %}
 
 </main>
