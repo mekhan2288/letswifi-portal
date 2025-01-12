@@ -20,14 +20,9 @@ $profileInfo = (array)$provider->getContact();
 $profileInfo['display_name'] = $provider->displayName;
 $profileInfo['description'] = $provider->description;
 if ( null !== $profileInfo['logo'] ) {
-	$vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
-	$path = \strstr( $_SERVER['REQUEST_URI'] ?? '', '?', true ) ?: $_SERVER['REQUEST_URI'] ?? '';
-	$issuer = \is_string( $vhost ) ? "https://{$vhost}{$path}" : null;
-	$indexUri = \dirname( "{$issuer}x" );
-
 	// Override the logo object with an URL to the logo
 	unset( $profileInfo['logo'] );
-	$profileInfo['logo_endpoint'] = "{$indexUri}/logo.php";
+	$profileInfo['logo_endpoint'] = "{$app->getCurrentIndexUrl()}logo.php";
 	\ksort( $profileInfo );
 }
 $app->render(

@@ -69,7 +69,7 @@ final class LetsWifiApp
 
 	public function isBrowser(): bool
 	{
-		return \substr( $_SERVER['HTTP_ACCEPT'] ?? '', 0, 9 ) === 'text/html';
+		return \str_starts_with( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/html' );
 	}
 
 	public function registerExceptionHandler(): void
@@ -136,6 +136,45 @@ final class LetsWifiApp
 		return $_SERVER['HTTP_HOST'];
 	}
 
+	public static function getCurrentUrl(): string
+	{
+		$vhost = self::getHttpHost();
+
+		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . static::getCurrentPath();
+	}
+
+	public static function getCurrentIndexUrl(): string
+	{
+		$vhost = self::getHttpHost();
+
+		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . static::getCurrentIndexPath();
+	}
+
+	public function getBaseUrl(): string
+	{
+		$vhost = self::getHttpHost();
+		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+		$path = \explode( '/', \rtrim( $this->getCurrentIndexPath(), '/' ) );
+		$baseParts = \explode( '/', $this->basePath );
+		while ( !empty( $baseParts ) ) {
+			$element = \array_shift( $baseParts );
+			if ( '..' === $element ) {
+				\array_pop( $path );
+			} elseif ( '.' !== $element && '' !== $element ) {
+				$path[] = $element;
+			}
+		}
+
+		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . \implode( '/', $path ) . '/';
+	}
+
+	public static function isHttps(): bool
+	{
+		return
+			( !empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'] )
+			|| '443' === ( $_SERVER['SERVER_PORT'] ?? '' );
+	}
+
 	public function getTranslationContext(): TranslationContext
 	{
 		if ( null === $this->translationContext ) {
@@ -187,6 +226,18 @@ final class LetsWifiApp
 		} while ( $data->has( 'issuer' ) );
 
 		return PKCS7::readChainPEM( "{$signingCert}{$signingKey}", null );
+	}
+
+	protected static function getCurrentIndexPath(): string
+	{
+		return \dirname( static::getCurrentPath() . 'x' ) . '/';
+	}
+
+	protected static function getCurrentPath(): string
+	{
+		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+		return \strstr( $requestUri, '?', true ) ?: $requestUri;
 	}
 
 	protected function getTwig(): Environment

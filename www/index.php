@@ -16,16 +16,14 @@ $basePath = '.';
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 
-$vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
-$path = \strstr( $_SERVER['REQUEST_URI'] ?? '', '?', true ) ?: $_SERVER['REQUEST_URI'] ?? '';
-$issuer = \is_string( $vhost ) ? "https://{$vhost}{$path}" : null;
-$apiConfiguration = \is_string( $issuer ) ? [
-	'authorization_endpoint' => "{$issuer}oauth/authorize/",
-	'token_endpoint' => "{$issuer}oauth/token/",
-	'eapconfig_endpoint' => "{$issuer}profiles/new/?format=eap-config",
-	'mobileconfig_endpoint' => "{$issuer}profiles/new/?format=apple-mobileconfig",
-	'profile_info_endpoint' => "{$issuer}profiles/info/",
-] : null;
+$baseUrl = $app->getBaseUrl();
+$apiConfiguration = [
+	'authorization_endpoint' => "{$baseUrl}oauth/authorize/",
+	'token_endpoint' => "{$baseUrl}oauth/token/",
+	'eapconfig_endpoint' => "{$baseUrl}profiles/new/?format=eap-config",
+	'mobileconfig_endpoint' => "{$baseUrl}profiles/new/?format=apple-mobileconfig",
+	'profile_info_endpoint' => "{$baseUrl}profiles/info/",
+];
 
 $app->render( [
 	'href' => "{$basePath}/",
