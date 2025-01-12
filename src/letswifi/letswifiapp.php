@@ -124,8 +124,8 @@ final class LetsWifiApp
 		exit( $template->render(
 			[
 				'_basePath' => $basePath,
-				'_lang' => $this->getTranslationContext()->primaryLocale,
-				'supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),
+				'_locale' => $this->getTranslationContext()->primaryLocale,
+				'_supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),
 			] + $data,
 		) );
 	}
@@ -133,7 +133,7 @@ final class LetsWifiApp
 	public static function getHttpHost(): string
 	{
 		if ( !\array_key_exists( 'HTTP_HOST', $_SERVER ) ) {
-			throw new RuntimeException( 'No HTTP Host: header provided' );
+			throw new RuntimeException( 'No HTTP Host header provided' );
 		}
 
 		return $_SERVER['HTTP_HOST'];
@@ -183,9 +183,15 @@ final class LetsWifiApp
 			\header( 'Cache-Control: no-store' );
 			\header( 'Content-Language: en-GB' );
 
-			exit( "Language in cookie set to \"{$_GET['lang']}\"\r\n\r\nPlease return to the previous page, or redirect:\r\n\r\n{$this->getCurrentUrl()}\r\n" );
+			exit( \implode( "\r\n", [
+				"Language in cookie set to \"{$_GET['lang']}\"",
+				'',
+				'Please return to the previous page, or redirect:',
+				'',
+				$this->getCurrentUrl(),
+				'',
+			] ) );
 		}
-
 		if ( null === $this->translationContext ) {
 			$this->translationContext = new TranslationContext(
 				userLocale: $_COOKIE['lang'] ?? null,
