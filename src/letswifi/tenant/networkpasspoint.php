@@ -28,13 +28,26 @@ class NetworkPasspoint extends Network
 		parent::__construct( networkId: $networkId, displayName: $displayName );
 	}
 
+	/**
+	 * @return array{network_id:string,display_name:MultiLanguageString,oids:array<string>,nai_realms:array<string>}
+	 */
+	public function jsonSerialize(): array
+	{
+		return [
+			'network_id' => $this->networkId,
+			'display_name' => $this->displayName,
+			'oids' => $this->oids,
+			'nai_realms' => $this->naiRealms,
+		];
+	}
+
 	public static function fromConfig( Dictionary $networkConfig ): self
 	{
 		return new self(
 			networkId: $networkConfig->getParentKey(),
 			displayName: $networkConfig->getMultiLanguageString( 'display_name' ),
 			oids: $networkConfig->getRawArray( 'oid' ),
-			naiRealms: $networkConfig->has( 'nai' ) ? $networkConfig->getRawArray( 'nai' ) : [],
+			naiRealms: $networkConfig->has( 'nai_realm' ) ? $networkConfig->getRawArray( 'nai_realm' ) : [],
 		);
 	}
 }

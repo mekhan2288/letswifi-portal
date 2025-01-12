@@ -10,9 +10,10 @@
 
 namespace letswifi\tenant;
 
+use JsonSerializable;
 use letswifi\configuration\Dictionary;
 
-class Contact
+class Contact implements JsonSerializable
 {
 	/**
 	 * @param array<Location> $location
@@ -24,6 +25,20 @@ class Contact
 		public readonly array $location = [],
 		public readonly ?Logo $logo = null,
 	) {
+	}
+
+	/**
+	 * @return array{mail:?string,web:?string,phone:?string,location:array<Location>,logo:bool}
+	 */
+	public function jsonSerialize(): array
+	{
+		return [
+			'mail' => $this->mail,
+			'web' => $this->web,
+			'phone' => $this->phone,
+			'location' => $this->location,
+			'logo' => isset( $this->logo ),
+		];
 	}
 
 	public static function fromConfig( Dictionary $contactData ): self

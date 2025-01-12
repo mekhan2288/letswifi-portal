@@ -34,13 +34,16 @@ class Provider implements JsonSerializable
 	) {
 	}
 
+	/**
+	 * @return array{host:string,display_name:MultiLanguageString,realm_map:array<string,array<string>>,contact:?Contact,description:?MultiLanguageString}
+	 */
 	public function jsonSerialize(): array
 	{
 		return [
 			'host' => $this->host,
-			'displayName' => $this->displayName,
-			'realmMap' => $this->realmMap,
-			'contactId' => $this->contactId,
+			'display_name' => $this->displayName,
+			'realm_map' => $this->realmMap,
+			'contact' => $this->getContact(),
 			'description' => $this->description,
 		];
 	}

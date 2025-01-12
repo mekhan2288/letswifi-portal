@@ -23,6 +23,18 @@ class NetworkSSID extends Network
 		parent::__construct( networkId: $networkId, displayName: $displayName );
 	}
 
+	/**
+	 * @return array{network_id:string,display_name:MultiLanguageString,ssid:string}
+	 */
+	public function jsonSerialize(): array
+	{
+		return [
+			'network_id' => $this->networkId,
+			'display_name' => $this->displayName,
+			'ssid' => $this->ssid,
+		];
+	}
+
 	public static function fromConfig( Dictionary $networkConfig ): self
 	{
 		return new self(

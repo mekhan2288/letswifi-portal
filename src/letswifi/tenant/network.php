@@ -11,10 +11,11 @@
 namespace letswifi\tenant;
 
 use DomainException;
+use JsonSerializable;
 use fyrkat\multilang\MultiLanguageString;
 use letswifi\configuration\Dictionary;
 
-abstract class Network
+abstract class Network implements JsonSerializable
 {
 	public function __construct( public readonly string $networkId, public readonly MultiLanguageString $displayName )
 	{
