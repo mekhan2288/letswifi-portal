@@ -8,3 +8,10 @@
 {% endif %}
 <title>geteduroam - {% block title %}{% endblock %}</title>
 {% block layout %}{% endblock %}
+<footer>
+	<ul id="languages">
+{% for displayName,locale in supportedLocales %}
+		<li lang="{{ locale }}"><a href="?lang={{ locale }}">{{ displayName }}</a></li>
+{% endfor %}
+	</ul>
+</footer>

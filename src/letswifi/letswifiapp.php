@@ -121,9 +121,12 @@ final class LetsWifiApp
 
 		$template = $this->getTwig()->load( "{$template}.html" );
 
-		exit( $template->render( [
-			'_basePath' => $basePath,
-			'_lang' => $this->getTranslationContext()->primaryLocale] + $data,
+		exit( $template->render(
+			[
+				'_basePath' => $basePath,
+				'_lang' => $this->getTranslationContext()->primaryLocale,
+				'supportedLocales' => $this->getTranslationContext()->getSupportedLocales(),
+			] + $data,
 		) );
 	}
 
@@ -153,19 +156,9 @@ final class LetsWifiApp
 	public function getBaseUrl(): string
 	{
 		$vhost = self::getHttpHost();
-		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-		$path = \explode( '/', \rtrim( $this->getCurrentIndexPath(), '/' ) );
-		$baseParts = \explode( '/', $this->basePath );
-		while ( !empty( $baseParts ) ) {
-			$element = \array_shift( $baseParts );
-			if ( '..' === $element ) {
-				\array_pop( $path );
-			} elseif ( '.' !== $element && '' !== $element ) {
-				$path[] = $element;
-			}
-		}
+		$path = $this->getBasePath();
 
-		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . \implode( '/', $path ) . '/';
+		return ( self::isHttps() ? 'https://' : 'http://' ) . $vhost . $path;
 	}
 
 	public static function isHttps(): bool
@@ -177,10 +170,27 @@ final class LetsWifiApp
 
 	public function getTranslationContext(): TranslationContext
 	{
+		if ( \array_key_exists( 'lang', $_GET ) && \is_string( $_GET['lang'] ) ) {
+			\setcookie( 'lang', $_GET['lang'], [
+				'path' => $this->getBasePath(),
+				'secure' => $this->isHttps(),
+				'samesite' => $this->isHttps() ? 'None' : 'Lax', // Some browser require HTTPS for 'None'
+				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#controlling_third-party_cookies_with_samesite
+			] );
+
+			\header( 'Location: ' . $this->getCurrentUrl(), true, 302 );
+			\header( 'Content-Type: text/plain' );
+			\header( 'Cache-Control: no-store' );
+			\header( 'Content-Language: en-GB' );
+
+			exit( "Language in cookie set to \"{$_GET['lang']}\"\r\n\r\nPlease return to the previous page, or redirect:\r\n\r\n{$this->getCurrentUrl()}\r\n" );
+		}
+
 		if ( null === $this->translationContext ) {
 			$this->translationContext = new TranslationContext(
 				userLocale: $_COOKIE['lang'] ?? null,
 				localeDirectory: \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'locale',
+				localeDirectoryType: 'php',
 			);
 		}
 
@@ -226,6 +236,23 @@ final class LetsWifiApp
 		} while ( $data->has( 'issuer' ) );
 
 		return PKCS7::readChainPEM( "{$signingCert}{$signingKey}", null );
+	}
+
+	protected function getBasePath(): string
+	{
+		$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+		$path = \explode( '/', \rtrim( $this->getCurrentIndexPath(), '/' ) );
+		$baseParts = \explode( '/', $this->basePath );
+		while ( !empty( $baseParts ) ) {
+			$element = \array_shift( $baseParts );
+			if ( '..' === $element ) {
+				\array_pop( $path );
+			} elseif ( '.' !== $element && '' !== $element ) {
+				$path[] = $element;
+			}
+		}
+
+		return \implode( '/', $path ) . '/';
 	}
 
 	protected static function getCurrentIndexPath(): string
