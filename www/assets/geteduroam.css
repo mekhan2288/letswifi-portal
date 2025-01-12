@@ -118,21 +118,22 @@ fieldset {
 fieldset > legend {
 	font-size: .7rem;
 }
-#realm-picker ul{
+#realm-picker ul {
 	padding: 0;
 	list-style: none;
 }
-#realm-picker ul input[type=radio]{
+#realm-picker ul input[type=radio] {
 	float: left;
 	clear: left;
 }
-#realm-picker ul label{
+#realm-picker ul label {
 	margin-left: 1.8em;
 	display: block;
 	margin-bottom: .8em;
 	padding-left: .2em;
 	border-radius: .2em;
 	cursor: pointer;
+	white-space: nowrap;
 }
 #realm-picker small {
 	opacity: .7;
