@@ -17,16 +17,18 @@ $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
 $profileInfo = (array)$provider->getContact();
-$profileInfo['displayName'] = $provider->displayName;
+$profileInfo['display_name'] = $provider->displayName;
 $profileInfo['description'] = $provider->description;
 if ( null !== $profileInfo['logo'] ) {
 	$vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
-	\assert( \is_string( $vhost ), 'HTTP_HOST should be string' );
-	$issuer = "https://{$vhost}";
-	$uri = \array_key_exists( 'REQUEST_URI', $_SERVER ) ? $_SERVER['REQUEST_URI'] : null;
-	\assert( \is_string( $uri ), 'REQUEST_URI should be string' );
-	$indexUri = \dirname( "{$uri}x" );
-	$profileInfo['logo']->href = "{$issuer}{$indexUri}/logo.php";
+	$path = \strstr( $_SERVER['REQUEST_URI'] ?? '', '?', true ) ?: $_SERVER['REQUEST_URI'] ?? '';
+	$issuer = \is_string( $vhost ) ? "https://{$vhost}{$path}" : null;
+	$indexUri = \dirname( "{$issuer}x" );
+
+	// Override the logo object with an URL to the logo
+	unset( $profileInfo['logo'] );
+	$profileInfo['logo_endpoint'] = "{$indexUri}/logo.php";
+	\ksort( $profileInfo );
 }
 $app->render(
 	[
