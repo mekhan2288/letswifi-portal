@@ -27,6 +27,5 @@ if ( null !== $profileInfo['logo'] ) {
 }
 $app->render(
 	[
-		'href' => "{$basePath}/profiles/info/",
 		'http://letswifi.app/profile#v2' => $profileInfo,
 	], null, $basePath );

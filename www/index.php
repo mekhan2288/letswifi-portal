@@ -26,6 +26,5 @@ $apiConfiguration = [
 ];
 
 $app->render( [
-	'href' => "{$basePath}/",
 	'http://letswifi.app/api#v2' => $apiConfiguration,
 ], 'info', $basePath );

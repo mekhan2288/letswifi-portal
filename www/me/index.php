@@ -20,6 +20,5 @@ $user = $provider->requireAuth();
 
 $app->render(
 	[
-		'href' => "{$basePath}/me/",
 		'user' => $user,
 	], null, $basePath );

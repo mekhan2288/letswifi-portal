@@ -17,7 +17,6 @@ $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 
 $app->render( [
-	'href' => $basePath . '/app/',
 	'apps' => [
 		'android' => [
 			'url' => 'https://play.google.com/store/apps/details?id=app.eduroam.geteduroam',

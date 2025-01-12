@@ -47,7 +47,6 @@ if ( isset( $passphrase ) ) {
 switch ( $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': $app->render(
 		[
-			'href' => $href,
 			'passphrase' => ( $passphrase ?? null ) ?: null,
 			'action' => "{$basePath}/profiles/new/",
 			'format' => $downloadFormat,

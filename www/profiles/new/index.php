@@ -81,7 +81,6 @@ if ( 'GET' === $_SERVER['REQUEST_METHOD'] && isset( $_GET['download'] ) ) {
 switch ( $overrideMethod ?? $_SERVER['REQUEST_METHOD'] ) {
 	case 'GET': $app->render(
 		[
-			'href' => "{$basePath}/profiles/new/",
 			'formats' => [
 				'apple-mobileconfig' => ['name' => 'Apple (iOS/MacOS)'],
 				'eap-config' => ['name' => 'eap-config'],
