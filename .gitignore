@@ -3,6 +3,10 @@
 !/etc/*/
 !/etc/*.dist.*
 !/etc/**/*.dist.*
+!/etc/*.dev.*
+!/etc/**/*.dev.*
+!/etc/*.md
+!/etc/**/*.md
 
 /composer.phar
 /fifo

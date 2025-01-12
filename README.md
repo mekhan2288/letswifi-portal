@@ -6,9 +6,11 @@ This is the reference CA for geteduroam.  It is intended to be used with an app 
 * The user is asked to log in or redirected to an SSO service
 * After logging in, the user is redirected to a callback URL from the app
 * The app has obtained an authorization_code, which it uses to retrieve an access_code
-* The access_code is used to generate an [eap-config](https://tools.ietf.org/html/draft-winter-opsawg-eap-metadata-02) file containing user credentials
+* The access_code is used to generate an [eap-config](https://tools.ietf.org/html/draft-winter-opsawg-eap-metadata-02)† file containing user credentials
 * The app installs the eap-config file
-* The server logs the public key material generated
+* The server logs the public key material generated, private key material is discarded
+
+† The draft is expired and the [actual format used by CAT and letswifi](https://github.com/GEANT/CAT/raw/refs/heads/master/devices/eap_config/eap-metadata.xsd) is slightly different than the document.
 
 
 ## Install dependencies
@@ -20,10 +22,8 @@ In order to automatically install dependencies, run:
 
 ## Running a development server
 
-	rm -rf etc/letswifi.conf.php var
+	rm -rf etc/provider.conf.php var
 	make dev
-
-The realm being used is `example.com`
 
 
 ### Testing manually
@@ -33,7 +33,7 @@ There is a [shell script to initiate an OAuth flow](https://github.com/geteduroa
 	./geteduroam.sh 'http://[::1]:1080' example.com >test.eap-config
 
 * If everything went fine, you get an eap-config XML payload in test.eap-config
-* You will see the public key material logged in the `tlscredential` SQL table
+* You will see the public key material logged in the `realm_signing_log` SQL table
 
 
 ## Getting up and running quick 'n dirty
@@ -49,13 +49,10 @@ Initialize the SQLite database (MySQL is also supported, this should be straight
 	mkdir var
 	sqlite3 var/letswifi-dev.sqlite <sql/letswifi-dev.sqlite.sql
 
-Copy etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php and change `userIdAttribute` to match your setup.
+Copy etc/provider.conf.dist.php etc/provider.conf.php and change the file to match your setup.
 
-	cp etc/letswifi.conf.simplesaml.php etc/letswifi.conf.php
-
-Create the realm with a default client certificate validity of one year
-
-	bin/add-realm.php example.com 365
+	cp etc/provider.conf.dist.php etc/provider.conf.php
+	$EDITOR etc/provider.conf.php
 
 Write metadata of your SAML IdP to simplesamlphp/metadata/saml20-idp-remote.php
 
@@ -73,3 +70,5 @@ All paths inside the application are relative, so this should work without any i
 Before committing, please run
 
 	make camera-ready
+
+And only commit if there are no errors.

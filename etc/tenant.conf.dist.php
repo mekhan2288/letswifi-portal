@@ -41,8 +41,8 @@
 			// to select a realm when they attempt to generate a profile.
 			// REQUIRED: Array affiliation => list of available realms
 			'realm' => [
-				'staff' => ['staff.example.com'],
-				'student' => ['student.example.com'],
+				//'staff' => ['staff.example.com'],
+				//'student' => ['student.example.com'],
 				'*' => ['example.com'],
 			],
 
@@ -60,8 +60,66 @@
 			// param are the parameters provided to the service.
 			// REQUIRED: Array service => string, param => array
 			'auth' => [
-				'service' => 'DevAuth',
-				'param' => [],
+				'service' => 'SimpleSamlAuth',
+				'param' => [
+					// A file to include for the SimpleSAMLphp autoloader.
+					// If this is not provided SimpleSAMLphp must be loaded another way.
+					// OPTIONAL: String path
+					'autoloadInclude' => '/usr/local/share/simplesamlphp/lib/_autoload.php',
+					// The auth source to use in SimpleSAMLphp.
+					// Must match auth source configured in SimpleSAMLphp.
+					// Required but set to default-sp if not provided or null.
+					// REQUIRED: String auth source
+					'authSource' => 'default-sp',
+
+					// The user ID attribute returned by the IdP.
+					// If not set, the NameID is used.
+					// REQUIRED: null|String attribute name
+					'userIdAttribute' => null,
+
+					// The affiliation attribute returned by the IdP.
+					// If not set, no affiliation for realm picking is used,
+					// only the wildcard realm will match in this case.
+					// OPTIONAL: String attribute name
+					'affiliationAttribute' => 'eduPersonAffiliation',
+
+					// Entity ID of the SAML IdP that the user must authenticate with.
+					// See https://simplesamlphp.org/docs/stable/saml/sp.html, saml:idp
+					// OPTIONAL: String attribute name
+					'samlIdp' => null,
+
+					// Entity IDs of SAML IdP that the user can authenticate with.
+					// Used for scoping in federated SAML setups.
+					// See https://simplesamlphp.org/docs/stable/saml/sp.html, IDPList
+					// OPTIONAL: Array list of IdPs that user can authenticate with
+					'idpList' => [],
+
+					// Verify that the assertion was created by one of the idpList IdPs.
+					// Generally a good idea, but might break with some simpler IdPs.
+					// This should at least be on when authenticating against a federation.
+					// OPTIONAL: Bool true to verify the IdP in the assertion
+					'verifyAuthenticatingAuthority' => true,
+
+					// A list of attributes that must be present in the SAML assertion
+					// in order to allow authentication.
+					// Use this for stricter SAML assertion checking.
+					// Value can be a string or array of strings,
+					// if it's an array of strings
+					// at least one string must match per attribute.
+					// OPTIONAL: Array attribute to expected value mapping
+					'authzAttributeValue' => [],
+
+					// Allowed home organisations
+					// This is used when multiple organisations share a SAML IdP
+					// OPTIONAL: Array of allowed values
+					'allowedHomeOrgs' => [],
+
+					// Attribute for the home organisation
+					// Defaults to schacHomeOrganization
+					// OPTIONAL: String home org attribute
+					'homeOrgAttribute' => 'schacHomeOrganization',
+
+				],
 			],
 
 			// Database for logging pseudocredentials and OAuth credentials
@@ -73,6 +131,8 @@
 			'clients#inc' => 'clients.conf.php',
 
 			// OAuth shared secret
+			// Create a new one with the following commands:
+			// umask 337; head -c16 /dev/random | base64 | tr -d = >oauthsecret.txt
 			// REQUIRED: String
 			'oauthsecret#file' => 'oauthsecret.txt',
 
@@ -81,8 +141,11 @@
 			// to be a certificate authority, but it must be publicly trusted
 			// in order to avoid MacOS/iOS from displaying the profile as
 			// being unsigned and untrusted.
+			// A normal, valid, server certificate for TLS suffices,
+			// the hostname is not important.
 			// OPTIONAL: String name of the certificate in the certificate list
-			'profile-signer' => 'CN=demo.letswifi.eu',
+			//'profile-signer' => 'CN=…',
+
 		],
 	],
 
@@ -100,13 +163,14 @@
 	// Realms are accessible to users depending on the realm settings in the provider.
 	'realm' => [
 		// Example realm for staff
-		'staff.example.com' => [
+		'example.com' => [
 			// The short name of the realm; multi-language,
 			// at least one language must be provided.
 			// Will be used as title in choice menus, profile installation, etc.
 			// REQUIRED: Array language => name
 			'display_name' => [
-				'en-GB' => 'Staff',
+				'en-GB' => 'Example',
+				'nl-NL' => 'Voorbeeld',
 			],
 
 			// Longer descriptive name of the realm; multi-language.
@@ -114,7 +178,8 @@
 			// Will be used as title in choice menus, profile installation, etc.
 			// OPTIONAL: Array language => name
 			'description' => [
-				'en-GB' => 'Network for staff',
+				'en-GB' => 'The example realm',
+				'nl-NL' => 'De voorbeeldrealm',
 			],
 
 			// The client requires that the RADIUS server presents a certificate
@@ -135,9 +200,7 @@
 			// Private key does not need to be present, but then the RADIUS server
 			// must be provisioned another way, such as through an ACME provider
 			// REQUIRED: Array, list of trusted CAs
-			'trust' => [
-				'C=US, O=Let\'s Encrypt, CN=R11',
-			],
+			'trust' => ['C=US, O=Let\'s Encrypt, CN=R11', 'CN=example.com Let\'s Wi-Fi CA'],
 
 			// When signing the client certificate credential,
 			// set the validity this many days in the future
@@ -159,28 +222,7 @@
 			// The names of the networks must match the network ID in this configuration
 			// REQUIRED: Array, list of network IDs
 			'networks' => ['eduroam'],
-		],
 
-		// Multiple example realms
-		'student.example.com' => [
-			'display_name' => ['en-GB' => 'Student'],
-			'description' => ['en-GB' => 'Network for students'],
-			'server_names' => ['radius.example.com'],
-			'signer' => 'CN=example.com Let\'s Wi-Fi CA',
-			'trust' => ['C=US, O=Let\'s Encrypt, CN=R11'],
-			'validity' => 365,
-			'contact' => 'example.com',
-			'networks' => ['eduroam'],
-		],
-		'example.com' => [
-			'display_name' => ['en-GB' => 'Example'],
-			'description' => ['en-GB' => 'The example realm'],
-			'server_names' => ['radius.example.com'],
-			'signer' => 'CN=example.com Let\'s Wi-Fi CA',
-			'trust' => ['C=US, O=Let\'s Encrypt, CN=R11'],
-			'validity' => 365,
-			'contact' => 'example.com',
-			'networks' => ['eduroam'],
 		],
 	],
 
@@ -242,7 +284,7 @@
 			'location' => [
 				['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
 			],
-			'location' => null, // REMOVE THIS LINE
+			'location' => [], // REMOVE THIS LINE
 
 			// Logo for the provider or realm
 			// This will be displayed prominent in the apps
@@ -251,6 +293,9 @@
 			'logo' => [
 				// The contents of the image file; it's recommended to instead use
 				// data#file and refer to a file instead
+				// If you don't want to set a logo, remove the whole logo,
+				// not just this entry; the logo is optional, but if you
+				// specify a logo, the data is required.
 				// REQUIRED: String
 				'data#file' => 'logo.png',
 
