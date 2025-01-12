@@ -55,7 +55,7 @@ class EapConfigFormat extends Format
 			$result .= ''
 				. "\r\n\t\t\t<Description lang=\"" . $this->e( $data['lang'] ) . '">' . $this->e( $data['display'] ) . '</Description>';
 		}
-		if ( null !== $location = $this->credential->provider->getContact()?->location ) {
+		foreach ( $this->credential->provider->getContact()?->location ?? [] as $location ) {
 			$result .= $this->generateLocationXml( $location );
 		}
 		if ( null !== $logo = $this->credential->provider->getContact()?->logo ) {

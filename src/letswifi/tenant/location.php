@@ -10,12 +10,21 @@
 
 namespace letswifi\tenant;
 
+use JsonSerializable;
 use letswifi\configuration\Dictionary;
 
-class Location
+class Location implements JsonSerializable
 {
 	public function __construct( public readonly float $lat, public readonly float $lon )
 	{
+	}
+
+	/**
+	 * @return array{lat:float,lon:float}
+	 */
+	public function jsonSerialize(): array
+	{
+		return ['lat' => $this->lat, 'lon' => $this->lon];
 	}
 
 	public static function fromConfig( Dictionary $location ): self

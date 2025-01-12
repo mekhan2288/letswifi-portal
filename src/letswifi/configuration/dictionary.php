@@ -77,6 +77,11 @@ class Dictionary implements ArrayAccess
 		return $this->has( $key ) ? $this->getDictionary( $key ) : null;
 	}
 
+	public function getDictionaryList( string $key ): array
+	{
+		return $this->getList( $key, self::class );
+	}
+
 	public function getDictionary( string $key ): self
 	{
 		$result = $this->get( $key, self::class );
@@ -131,33 +136,60 @@ class Dictionary implements ArrayAccess
 	 * @param                   $key The key to retrieve the value for
 	 * @param class-string<T>|T $t   Type of the expected return value, either an object, classname, or falsey scalar or array (e.g. `''`, `[]`, `0`, `0.0`, `false`)
 	 *
-	 * @psalm-suppress InvalidReturnType
-	 *
 	 * @return T
 	 */
 	protected function get( string $key, mixed $t ): mixed
 	{
-		$result = $this->has( $key ) ? $this->offsetGet( $key ) : null;
+		return $this->getValue( $key, $this->has( $key ) ? $this->offsetGet( $key ) : null, $t );
+	}
 
+	/**
+	 * @template T
+	 *
+	 * @param                   $key The key to retrieve the value for
+	 * @param class-string<T>|T $t   Type of the expected return value, either an object, classname, or falsey scalar or array (e.g. `''`, `[]`, `0`, `0.0`, `false`)
+	 *
+	 * @return array<T>
+	 */
+	protected function getList( string $key, mixed $t ): array
+	{
+		$rawList = $this->has( $key ) ? $this->offsetGet( $key ) : [];
+
+		return \array_map( fn( mixed $v ) => $this->getValue( $key, $v, $t ), $rawList );
+	}
+
+	/**
+	 * @template T
+	 *
+	 * @param                   $key   The key to retrieve the value for
+	 * @param                   $value The value found
+	 * @param class-string<T>|T $t     Expected type of the value, either an object, classname, or falsey scalar or array (e.g. `''`, `[]`, `0`, `0.0`, `false`)
+	 *
+	 *@psalm-suppress InvalidReturnType
+	 *
+	 * @return T
+	 */
+	private function getValue( string $key, mixed $value, mixed $t ): mixed
+	{
 		/** @psalm-suppress InvalidReturnStatement */
-		if ( !$t ) { // type is falsey so we return if result is of same type
-			if ( \is_string( $t ) && \is_string( $result ) ) {
-				return $result;
+		if ( !$t ) { // type is falsey so we return if value is of same type
+			if ( \is_string( $t ) && \is_string( $value ) ) {
+				return $value;
 			}
-			if ( \is_array( $t ) && \is_array( $result ) ) {
-				return $result;
+			if ( \is_array( $t ) && \is_array( $value ) ) {
+				return $value;
 			}
-			if ( \is_int( $t ) && \is_int( $result ) ) {
-				return $result;
+			if ( \is_int( $t ) && \is_int( $value ) ) {
+				return $value;
 			}
-			if ( \is_float( $t ) && ( \is_float( $result ) || \is_int( $result ) ) ) {
-				return (float)$result;
+			if ( \is_float( $t ) && ( \is_float( $value ) || \is_int( $value ) ) ) {
+				return (float)$value;
 			}
-			if ( \is_bool( $t ) && \is_bool( $result ) ) {
-				return $result;
+			if ( \is_bool( $t ) && \is_bool( $value ) ) {
+				return $value;
 			}
 
-			throw new ConfigurationException( $this->getConfigPath( $key ) . ': Expected value of type ' . \gettype( $t ) . ' but got ' . \gettype( $result ) );
+			throw new ConfigurationException( $this->getConfigPath( $key ) . ': Expected value of type ' . \gettype( $t ) . ' but got ' . \gettype( $value ) );
 		}
 		$class = null;
 		if ( \is_object( $t ) ) {
@@ -173,6 +205,6 @@ class Dictionary implements ArrayAccess
 		}
 
 		/** @psalm-suppress InvalidReturnStatement */
-		return new $class( $result );
+		return new $class( $value );
 	}
 }

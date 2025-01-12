@@ -239,7 +239,9 @@
 			// This data, if provided, is included in the API and in eap-config files,
 			// but currently it's not being used for anything.
 			// OPTIONAL: Array with lat: float, lon: float
-			'location' => ['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
+			'location' => [
+				['lat' => 52.0, 'lon' => 5.1], // Utrecht Centraal
+			],
 			'location' => null, // REMOVE THIS LINE
 
 			// Logo for the provider or realm
