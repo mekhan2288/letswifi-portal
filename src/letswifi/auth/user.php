@@ -11,9 +11,10 @@
 namespace letswifi\auth;
 
 use DomainException;
+use JsonSerializable;
 use letswifi\tenant\Realm;
 
-class User
+class User implements JsonSerializable
 {
 	/**
 	 * @param array<string,Realm> $realms
@@ -27,6 +28,18 @@ class User
 		public readonly ?string $ip = null,
 		public readonly ?string $userAgent = null,
 	) {
+	}
+
+	public function jsonSerialize(): array
+	{
+		return [
+			'user_id' => $this->userId,
+			'realms' => \array_keys( $this->realms ),
+			'affiliations' => $this->affiliations,
+			'client_id' => $this->clientId,
+			'ip' => $this->ip,
+			'user_agent' => $this->userAgent,
+		];
 	}
 
 	/** @return array<string,Realm>*/
@@ -56,6 +69,7 @@ class User
 
 			throw new DomainException( 'No default realm is available for the current user' );
 		}
+
 		if ( \array_key_exists( $realmId, $this->realms ) ) {
 			return $this->realms[$realmId];
 		}

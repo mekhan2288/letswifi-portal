@@ -53,16 +53,13 @@ class Realm implements JsonSerializable
 	}
 
 	/**
-	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,server_names:array<string>,trust:array<X509>,validity:string,contact:?Contact}
+	 * @return array{realm_id:string,display_name:MultiLanguageString,description:?MultiLanguageString,contact:?Contact}
 	 */
 	public function jsonSerialize(): array
 	{
 		return [
 			'realm_id' => $this->realmId,
 			'display_name' => $this->displayName,
-			'server_names' => $this->serverNames,
-			'trust' => $this->trust,
-			'validity' => $this->validity->format( 'P%dD' ),
 			'description' => $this->description,
 			'contact' => $this->getContact(),
 		];

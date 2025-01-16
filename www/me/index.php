@@ -12,13 +12,13 @@ use letswifi\LetsWifiApp;
 
 require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 2 ), 'src', '_autoload.php'] );
 $basePath = '..';
-
 $app = new LetsWifiApp( basePath: $basePath );
 $app->registerExceptionHandler();
 $provider = $app->getProvider();
 $user = $provider->requireAuth();
-
 $app->render(
 	[
 		'user' => $user,
+		'realms' => $user->getRealms(),
+		// TODO show realms with credential counts
 	], null, $basePath );
