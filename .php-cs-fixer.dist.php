@@ -4,6 +4,7 @@ $finder = PhpCsFixer\Finder::create()
 	->in(__DIR__ . DIRECTORY_SEPARATOR . 'src')
 	->in(__DIR__ . DIRECTORY_SEPARATOR . 'www')
 	->in(__DIR__ . DIRECTORY_SEPARATOR . 'tests')
+	->in(__DIR__ . DIRECTORY_SEPARATOR . 'locale')
 	->in(__DIR__ . DIRECTORY_SEPARATOR . '.phan')
 	->notName('_autoload.php')
 ;
