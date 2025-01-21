@@ -27,4 +27,35 @@ $apiConfiguration = \is_string( $issuer ) ? [
 $app->render( [
 	'href' => "${basePath}/",
 	'http://letswifi.app/api#v2' => $apiConfiguration,
-], 'info', $basePath );
+	'apps' => [
+		'android' => [
+			'url' => 'https://play.google.com/store/apps/details?id=app.eduroam.geteduroam',
+			'name' => 'Android',
+		],
+		'ios' => [
+			'url' => 'https://apps.apple.com/app/geteduroam/id1504076137',
+			'name' => 'iOS',
+		],
+		'windows' => [
+			'url' => 'https://dl.eduroam.app/windows/x86_64/geteduroam.exe',
+			'name' => 'Windows',
+		],
+		'huawei' => [
+			'url' => 'https://appgallery.huawei.com/app/C104231893',
+			'name' => 'Huawei',
+		],
+	],
+	'os_config' => [
+		'mobileconfig' => [
+			'url' => "${basePath}/profiles/mac/",
+			'name' => 'macOS',
+		],
+		'onc' => [
+			'url' => "${basePath}/profiles/onc/",
+			'name' => 'ChromeOS',
+		],
+	],
+	'manual' => [
+		'url' => "${basePath}/profiles/new/",
+	],
+], 'app', $basePath );

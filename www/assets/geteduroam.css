@@ -97,6 +97,16 @@ hr {
 .btn.btn-default:active {
 	background: #2e75eb;
 }
+.btn.highlight {
+    font-size: 1.2em; 
+    padding: 0.4em 2.5em; 
+    font-weight: bold; 
+    background: #008fa7 !important; 
+    border: 2px solid #008fa7; 
+}
+.btn.highlight:active {
+    background: #008fa7 !important;
+}
 .btn-txt {
 	color: #212529;
 	display: inline;

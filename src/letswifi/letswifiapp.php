@@ -276,6 +276,7 @@ class LetsWifiApp
 
 	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): void
 	{
+		$data['user_os'] = $this->getUserOS();
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );
 			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) . "\r\n" );
@@ -339,5 +340,19 @@ class LetsWifiApp
 		}
 
 		return $realm;
+	}
+
+	public function getUserOS(): string
+	{
+		$useros = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
+		if (strpos($useros, 'macintosh') !== false  || strpos($useros, 'mac os') !== false ) {
+			return 'macos';
+		} elseif (strpos($useros, 'windows') !== false ) {
+			return 'windows';
+		} elseif (strpos($useros, 'andriod') !== false ) {
+			return 'andriod';
+		} elseif (strpos($useros, 'iphone') !== false ) {
+			return 'ios';
+		}
 	}
 }
