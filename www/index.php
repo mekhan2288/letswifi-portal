@@ -14,6 +14,8 @@ $basePath = '.';
 $app = new letswifi\LetsWifiApp();
 $app->registerExceptionHandler();
 
+$useros = $app->getUserOS();
+
 $vhost = \array_key_exists( 'HTTP_HOST', $_SERVER ) ? $_SERVER['HTTP_HOST'] : null;
 $path = \strstr( $_SERVER['REQUEST_URI'] ?? '', '?', true ) ?: $_SERVER['REQUEST_URI'] ?? '';
 $issuer = \is_string( $vhost ) ? "https://${vhost}${path}" : null;
@@ -26,6 +28,7 @@ $apiConfiguration = \is_string( $issuer ) ? [
 
 $app->render( [
 	'href' => "${basePath}/",
+	'user_os' => "$useros",
 	'http://letswifi.app/api#v2' => $apiConfiguration,
 	'apps' => [
 		'android' => [

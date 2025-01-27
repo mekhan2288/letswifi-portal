@@ -276,7 +276,6 @@ class LetsWifiApp
 
 	public function render( array $data, ?string $template = null, ?string $basePath = '/' ): void
 	{
-		$data['user_os'] = $this->getUserOS();
 		if ( null === $template || \array_key_exists( 'json', $_GET ) || !$this->isBrowser() ) {
 			\header( 'Content-Type: application/json' );
 			exit( \json_encode( $data, \JSON_UNESCAPED_SLASHES ) . "\r\n" );

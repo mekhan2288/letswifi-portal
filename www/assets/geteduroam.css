@@ -101,11 +101,11 @@ hr {
     font-size: 1.2em; 
     padding: 0.4em 2.5em; 
     font-weight: bold; 
-    background: #008fa7 !important; 
-    border: 2px solid #008fa7; 
+    background: #05f !important; 
+    border: 2px solid #05f; 
 }
 .btn.highlight:active {
-    background: #008fa7 !important;
+    background: #05f !important;
 }
 .btn-txt {
 	color: #212529;
