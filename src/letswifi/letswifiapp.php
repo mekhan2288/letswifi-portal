@@ -244,6 +244,25 @@ final class LetsWifiApp
 		return PKCS7::readChainPEM( "{$signingCert}{$signingKey}", null );
 	}
 
+	public function getUserOS(): string
+	{
+		$useros = \strtolower( $_SERVER['HTTP_USER_AGENT'] ?? '' );
+		if ( \str_contains( $useros, 'macintosh' ) || \str_contains( $useros, 'mac os' ) ) {
+			return 'macos';
+		}
+		if ( \str_contains( $useros, 'windows' ) ) {
+			return 'windows';
+		}
+		if ( \str_contains( $useros, 'andriod' ) ) {
+			return 'andriod';
+		}
+		if ( \str_contains( $useros, 'iphone' ) ) {
+			return 'ios';
+		}
+
+		return '';
+	}
+
 	protected function getBasePath(): string
 	{
 		$requestUri = $_SERVER['REQUEST_URI'] ?? '';

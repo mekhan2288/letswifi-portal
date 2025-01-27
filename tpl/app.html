@@ -3,27 +3,29 @@
 {% block title %}Apps{% endblock %}
 
 {% block content %}
-<main>
-	<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
-	<p>For most users, the easiest way to use geteduroam is to use one of the official apps.</p>
-	<ul class="apps buttons">
-{% for id,app in apps %}
-		<li><a class="btn btn-default" href="{{ app.url }}">{{ app.name }}</a></li>
-{% endfor %}
-	</ul>
-{% if os_config %}
-	<hr>
-	<p>For some platforms there are no apps available. For these platforms, you can download a configuration profile that you can install directly using the operating systems facilities.</p>
-	<ul class="apps buttons devices">
-{% for id,conf in os_config %}
-		<li><a href="{{ conf.url }}" class="btn btn-default">{{ conf.name }}</a></li>
-{% endfor %}
-	</ul>
-{% endif %}
-	<hr>
-	<details>
-		<summary>Options for other platforms and professional users</summary>
-		<p class="apps"><a href="{{ manual.url }}" class="btn btn-default">Generate a certificate for manual use</a></p>
-	</details>
-</main>
+<div class="main-container">
+	<main>
+		<h1>geteduroam<small>– eduroam authentication made easy</small></h1>
+		<p>For most users, Get connected easily with the geteduroam official apps.</p>
+		<ul class="apps buttons">
+	{% for id,app in apps %}
+			<li><a class="btn btn-default {% if app.name|lower == user_os%}highlight{% endif %}" href="{{ app.url }}">{{ app.name }}</a></li>
+	{% endfor %}
+		</ul>
+	{% if os_config %}
+		<hr>
+		<p>For platforms without an app, install a configuration profile instead.</p>
+		<ul class="apps buttons devices">
+	{% for id,conf in os_config %}
+			<li><a href="{{ conf.url }}" class="btn btn-default {% if conf.name|lower == user_os%}highlight{% endif %}">{{ conf.name }}</a></li>
+	{% endfor %}
+		</ul>
+	{% endif %}
+		<hr>
+		<details>
+			<summary>Options for other platforms and professional users</summary>
+			<p class="apps"><a href="{{ manual.url }}" class="btn btn-default">Generate a certificate for manual use</a></p>
+		</details>
+	</main>
+</div>	
 {% endblock %}
