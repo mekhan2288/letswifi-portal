@@ -20,6 +20,7 @@ use fyrkat\multilang\TranslationContext;
 use fyrkat\openssl\PKCS7;
 use letswifi\auth\User;
 use letswifi\credential\UserCredentialLog;
+use letswifi\tenant\AppConfigLoader;
 use letswifi\tenant\Provider;
 use letswifi\tenant\Realm;
 use letswifi\tenant\TenantConfig;
@@ -54,10 +55,15 @@ final class LetsWifiApp
 
 	private readonly LetsWifiConfig $config;
 
+	private array $appsConfig;
+
 	public function __construct( public readonly string $basePath, ?LetsWifiConfig $config = null )
 	{
 		$this->config = $config ?? new LetsWifiConfig( new configuration\DictionaryFile( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'tenant.conf.php' ) );
 		$this->tenantConfig = new TenantConfig( $this->config );
+
+		$configLoader = new AppConfigLoader( \dirname( __DIR__, 2 ) . \DIRECTORY_SEPARATOR . 'etc' . \DIRECTORY_SEPARATOR . 'apps.conf.php' );
+		$this->appsConfig = $configLoader->getConfigData();
 	}
 
 	public function getIP(): string
@@ -261,6 +267,11 @@ final class LetsWifiApp
 		}
 
 		return '';
+	}
+
+	public function getAppConfig(): array
+	{
+		return $this->appsConfig;
 	}
 
 	protected function getBasePath(): string

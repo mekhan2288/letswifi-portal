@@ -9,18 +9,49 @@
 		<p>For most users, Get connected easily with the geteduroam official apps.</p>
 		<ul class="apps buttons">
 	{% for id,app in apps %}
-			<li><a class="btn btn-default {% if app.name|lower == user_os%}highlight{% endif %}" href="{{ app.url }}">{{ app.name }}</a></li>
+		{% if app.enabled and app.name|lower == user_os%}
+			<li><a class="btn btn-default highlight" href="{{ app.url }}">{{ app.name }}</a></li>
+		{% endif %}
 	{% endfor %}
 		</ul>
-	{% if os_config %}
-		<hr>
-		<p>For platforms without an app, install a configuration profile instead.</p>
-		<ul class="apps buttons devices">
-	{% for id,conf in os_config %}
-			<li><a href="{{ conf.url }}" class="btn btn-default {% if conf.name|lower == user_os%}highlight{% endif %}">{{ conf.name }}</a></li>
-	{% endfor %}
-		</ul>
+
+	{% if apps %}
+		<details>
+			<summary>See all other apps</summary>
+			<ul class="apps buttons">
+				{% for id,app in apps %}
+					{% if app.enabled and app.name|lower != user_os%}
+						<li><a class="btn btn-default" href="{{ app.url }}">{{ app.name }}</a></li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</details>
 	{% endif %}
+
+	{% if os_config %}
+			<hr>
+			<p>For platforms without an app, install a configuration profile instead.</p>
+			<ul class="apps buttons devices">
+		{% for id,conf in os_config %}
+			{% if conf.enabled and conf.name|lower == user_os %}
+				<li><a href="{{ conf.url }}" class="btn btn-default highlight">{{ conf.name }}</a></li>
+			{% endif %}	
+		{% endfor %}
+			</ul>
+		{% if os_config  %}
+			<details>
+				<summary>See all other configurations</summary>
+				<ul class="apps buttons">
+					{% for id,conf in os_config %}
+						{% if conf.enabled and conf.name|lower != user_os%}
+							<li><a class="btn btn-default" href="{{ conf.url }}">{{ conf.name }}</a></li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</details>
+		{% endif %}
+	{% endif %}
+
 		<hr>
 		<details>
 			<summary>Options for other platforms and professional users</summary>
